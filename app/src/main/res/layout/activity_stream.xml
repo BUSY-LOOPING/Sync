@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/item_color"
+    tools:context=".StreamActivity">
+
+    <com.google.android.material.appbar.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <androidx.appcompat.widget.Toolbar
+            app:navigationIcon="@drawable/ic_baseline_arrow_back"
+            android:id="@+id/toolbar_activity_stream"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:background="@color/color_primary"
+            app:layout_scrollFlags="scroll|snap|enterAlways"
+            app:title="Streams" />
+
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+
+        <LinearLayout
+            android:id="@+id/lin"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:weightSum="12">
+
+            <ImageView
+                android:id="@+id/pasteBtn_activity_stream"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:layout_weight="2"
+                android:background="?selectableItemBackgroundBorderless"
+                android:clickable="true"
+                android:focusable="true"
+                app:srcCompat="@drawable/ic_paste"
+                app:tint="@color/tab_highlight" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_width="0dp"
+                android:layout_height="60dp"
+                android:layout_weight="8"
+                android:textColorHint="@color/infoActLightGrey"
+                app:boxCornerRadiusBottomEnd="10dp"
+                app:boxCornerRadiusBottomStart="10dp"
+                app:boxCornerRadiusTopEnd="10dp"
+                app:boxCornerRadiusTopStart="10dp"
+                app:boxStrokeColor="@color/custom_stroke_color_edit_text"
+                app:boxStrokeWidth="2dp"
+                app:hintEnabled="true"
+                app:hintTextColor="@color/tab_highlight">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editText_activity_stream"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:hint="Enter network address: e.g. http://, mms:// or rtpms://"
+                    android:maxLines="1"
+                    android:singleLine="true"
+                    android:textColor="@color/infoActLightGrey"
+                    android:textCursorDrawable="@drawable/cursor_color" />
+
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <ImageView
+                android:id="@+id/search_btn_activity_stream"
+                android:layout_width="0dp"
+                android:layout_height="35dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:layout_weight="2"
+                android:background="?selectableItemBackgroundBorderless"
+                app:srcCompat="@drawable/ic_search"
+                app:tint="@color/tab_highlight" />
+
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/lin"/>
+    </RelativeLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

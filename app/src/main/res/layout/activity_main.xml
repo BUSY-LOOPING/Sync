@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:id="@+id/main_container"
+    android:layout_height="match_parent">
+
+
+    <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/coordinator_main"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.google.android.material.appbar.AppBarLayout
+            android:id="@+id/app_bar_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:theme="@style/Theme.IMusic">
+
+<!--            <com.google.android.material.appbar.CollapsingToolbarLayout-->
+<!--                android:id="@+id/collapsingToolbar"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="160dp"-->
+<!--                android:background="@color/color_primary"-->
+<!--                android:fitsSystemWindows="true"-->
+<!--                android:theme="@style/Theme.IMusic"-->
+<!--                app:expandedTitleGravity="center_horizontal|center_vertical"-->
+<!--                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed|snap"-->
+<!--                app:title="iMusic">-->
+
+<!--                <androidx.appcompat.widget.Toolbar-->
+<!--                    android:id="@+id/toolbar"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="?actionBarSize"-->
+<!--                    android:fitsSystemWindows="true"-->
+<!--                    android:background="@color/color_primary"-->
+<!--                    app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed|snap"-->
+<!--                    android:theme="@style/Theme.IMusic"-->
+<!--                    app:layout_collapseMode="pin" />-->
+
+<!--            </com.google.android.material.appbar.CollapsingToolbarLayout>-->
+
+            <androidx.appcompat.widget.Toolbar
+                app:title="iMusic"
+                app:titleTextColor="@color/white"
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?actionBarSize"
+                android:fitsSystemWindows="true"
+                android:background="@color/color_primary"
+                app:layout_scrollFlags="scroll|enterAlways|enterAlwaysCollapsed|snap"
+                android:theme="@style/Theme.IMusic"
+                app:layout_collapseMode="pin" />
+
+        </com.google.android.material.appbar.AppBarLayout>
+
+
+        <androidx.viewpager.widget.ViewPager
+            android:id="@+id/view_pager_main"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_above="@+id/bottom_navigation"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab_shuffle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="25dp"
+            android:backgroundTint="@color/tab_highlight"
+            android:contentDescription="shuffle"
+            android:src="@drawable/exo_controls_shuffle_on"
+            app:borderWidth="0dp"
+            app:layout_anchor="@id/mini_player_container"
+            app:layout_anchorGravity="end"
+            app:layout_insetEdge="bottom"
+            app:maxImageSize="30dp" />
+
+        <include
+            layout="@layout/bottom_sheet_mini_player"/>
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="?actionBarSize"
+            android:layout_gravity="bottom"
+            android:background="@color/color_primary"
+            app:itemIconTint="@color/custom_bottom_nav_color"
+            app:itemTextColor="@color/custom_bottom_nav_color"
+            app:labelVisibilityMode="labeled"
+            app:menu="@menu/bottom_navigation_menu"
+            app:layout_behavior="com.google.android.material.behavior.HideBottomViewOnScrollBehavior"/>
+
+
+    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
+
+</RelativeLayout>
+
+
+
+
+
+

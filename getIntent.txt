@@ -1,0 +1,16 @@
+if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+            mediaPlayer.start();
+            if (repeatBoolean) {
+                repeatBtn.setImageResource(R.drawable.ic_repeat_on);
+            }
+            if (shuffleBoolean) {
+                shuffleBtn.setImageResource(R.drawable.ic_shuffle_on);
+            }
+        } else {
+            mediaPlayer = MediaPlayer.create(getApplicationContext(), uri);
+            mediaPlayer.start();
+        }
+        seekBar.setMax(mediaPlayer.getDuration() / 1000);    //getDuration returns integer value in milliseconds so we have to devide by 1000

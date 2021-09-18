@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:key="key">
+    <PreferenceCategory
+        android:title="Video">
+
+        <ListPreference
+            android:summary="Select iMusic behavior when you switch to other application from video playback"
+            app:summary="Select iMusic behavior when you switch to other application from video playback"
+            android:defaultValue="true"
+            android:entries="@array/video_mode"
+            android:entryValues="@array/video_mode_value"
+            android:key="background_pipmode"
+            android:title="Background/Pip mode" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Video">
+
+        <ListPreference
+            android:summary="Select iMusic behavior when you swicth to other application from video playback"
+            app:summary="Select iMusic behavior when you swicth to other application from video playback"
+            android:defaultValue="true"
+            android:entries="@array/video_mode"
+            android:entryValues="@array/video_mode_value"
+            android:key="background_pipmode"
+            android:title="Background/Pip mode" />
+
+    </PreferenceCategory>
+    <PreferenceCategory
+        android:title="Video">
+
+        <ListPreference
+            android:summary="Select iMusic behavior when you switch to other application from video playback"
+            app:summary="Select iMusic behavior when you switch to other application from video playback"
+            android:defaultValue="true"
+            android:entries="@array/video_mode"
+            android:entryValues="@array/video_mode_value"
+            android:key="background_pipmode"
+            android:title="Background/Pip mode" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="Video">
+
+        <ListPreference
+            android:summary="Select iMusic behavior when you switch to other application from video playback"
+            app:summary="Select iMusic behavior when you switch to other application from video playback"
+            android:defaultValue="true"
+            android:entries="@array/video_mode"
+            android:entryValues="@array/video_mode_value"
+            android:key="background_pipmode"
+            android:title="Background/Pip mode" />
+
+    </PreferenceCategory>
+
+</PreferenceScreen>

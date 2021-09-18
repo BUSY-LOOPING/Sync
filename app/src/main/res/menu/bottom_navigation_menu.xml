@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/page_1"
+        android:icon="@drawable/ic_baseline_music_note_24"
+        android:title="Music"/>
+
+    <item
+        android:id="@+id/page_2"
+        android:icon="@drawable/ic_movie"
+        android:title="Video" />
+
+    <item
+        android:id="@+id/page_3"
+        android:icon="@drawable/ic_baseline_folder_24"
+        android:title="Browse"/>
+
+    <item
+        android:id="@+id/page_4"
+        android:icon="@drawable/ic_baseline_playlist_play_24"
+        android:title="Playlists"/>
+
+    <item
+        android:id="@+id/page_5"
+        android:icon="@drawable/ic_baseline_more_horiz_24"
+        android:title="More"/>
+
+</menu>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="video_mode">
+        <item>Stop</item>
+        <item>Play videos in background</item>
+        <item>Play videos in Picture-in-picture mode</item>
+    </string-array>
+
+    <string-array name="video_mode_value">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+</resources>

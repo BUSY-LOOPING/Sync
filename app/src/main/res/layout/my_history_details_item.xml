@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="65dp"
+    android:background="@drawable/custom_ripple"
+    android:layout_marginTop="5dp">
+
+    <RelativeLayout
+        android:id="@+id/img_rel"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="20dp">
+
+        <ImageView
+            android:id="@+id/video_thumbnail"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:scaleType="centerCrop"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/type_img"
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            app:srcCompat="@drawable/ic_music_note_freeicons"
+            app:tint="#404040" />
+
+        <ImageView
+            android:id="@+id/img_history_item"
+            android:layout_width="40dp"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="10dp"
+            android:layout_toEndOf="@+id/type_img"
+            app:srcCompat="@drawable/ic_music_note_full_freeicons"
+            app:tint="@color/infoActDarkGrey" />
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginStart="20dp"
+        android:layout_toEndOf="@+id/img_rel"
+        android:gravity="center_vertical"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/name_history_details_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="marquee"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:scrollHorizontally="true"
+            android:singleLine="true"
+            android:text="Name"
+            android:textColor="@color/white"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/artist_history_details_item"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="album"
+            android:textColor="@color/infoActLightGrey"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
+
+</RelativeLayout>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="140dp"
+    android:layout_height="140dp"
+    android:layout_margin="2dp"
+    app:cardCornerRadius="5dp"
+    app:cardPreventCornerOverlap="false">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/fav_files_bg_browse_fragment">
+
+        <ImageView
+            android:id="@+id/thumbnail_history_item"
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            android:layout_centerHorizontal="true"
+            android:scaleType="centerCrop"
+            android:visibility="invisible" />
+
+        <ImageView
+            android:id="@+id/type_img"
+            android:layout_width="40dp"
+            android:layout_height="100dp"
+            app:srcCompat="@drawable/ic_music_note_freeicons"
+            app:tint="#404040" />
+
+
+        <ImageView
+            android:id="@+id/img_history_item"
+            android:layout_width="100dp"
+            android:layout_height="95dp"
+            android:layout_toEndOf="@+id/type_img"
+            android:scaleType="center"
+            app:srcCompat="@drawable/ic_music_note_full_freeicons"
+            app:tint="@color/infoActDarkGrey" />
+
+        <LinearLayout
+            android:id="@+id/name_history_item_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/img_history_item"
+            android:layout_marginStart="5dp"
+            android:layout_marginBottom="5dp"
+            android:gravity="center_vertical"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/name_history_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Name"
+                android:textColor="#dcdcdc"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/details_history_item"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="details"
+                android:textColor="@color/infoActLightGrey"
+                android:textSize="11sp" />
+
+        </LinearLayout>
+
+
+    </RelativeLayout>
+</com.google.android.material.card.MaterialCardView>

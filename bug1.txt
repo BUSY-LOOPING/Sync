@@ -1,0 +1,31 @@
+2021-08-13 14:49:02.033 32328-32328/com.example.imusic E/AndroidRuntime: FATAL EXCEPTION: main
+    Process: com.example.imusic, PID: 32328
+    java.lang.IllegalStateException: Failed to lookup info for package com.example.imusic
+        at android.os.Parcel.createException(Parcel.java:1958)
+        at android.os.Parcel.readException(Parcel.java:1918)
+        at android.database.DatabaseUtils.readExceptionFromParcel(DatabaseUtils.java:183)
+        at android.database.DatabaseUtils.readExceptionFromParcel(DatabaseUtils.java:135)
+        at android.content.ContentProviderProxy.call(ContentProviderNative.java:651)
+        at android.provider.Settings$NameValueCache.getStringForUser(Settings.java:2099)
+        at android.provider.Settings$Global.getStringForUser(Settings.java:12212)
+        at android.provider.Settings$Global.getString(Settings.java:12201)
+        at android.provider.Settings$Global.getInt(Settings.java:12380)
+        at android.os.GraphicsEnvironment.setupGpuLayers(GraphicsEnvironment.java:95)
+        at android.os.GraphicsEnvironment.setup(GraphicsEnvironment.java:56)
+        at android.app.ActivityThread.setupGraphicsSupport(ActivityThread.java:5475)
+        at android.app.ActivityThread.handleBindApplication(ActivityThread.java:5756)
+        at android.app.ActivityThread.access$1100(ActivityThread.java:199)
+        at android.app.ActivityThread$H.handleMessage(ActivityThread.java:1650)
+        at android.os.Handler.dispatchMessage(Handler.java:106)
+        at android.os.Looper.loop(Looper.java:193)
+        at android.app.ActivityThread.main(ActivityThread.java:6669)
+        at java.lang.reflect.Method.invoke(Native Method)
+        at com.android.internal.os.RuntimeInit$MethodAndArgsCaller.run(RuntimeInit.java:493)
+        at com.android.internal.os.ZygoteInit.main(ZygoteInit.java:858)
+     Caused by: android.os.RemoteException: Remote stack trace:
+        at com.android.providers.settings.SettingsProvider.getCallingApplicationInfoOrThrow(SettingsProvider.java:1741)
+        at com.android.providers.settings.SettingsProvider.enforceSettingReadable(SettingsProvider.java:1714)
+        at com.android.providers.settings.SettingsProvider.getGlobalSetting(SettingsProvider.java:964)
+        at com.android.providers.settings.SettingsProvider.call(SettingsProvider.java:384)
+        at android.content.ContentProvider$Transport.call(ContentProvider.java:403)
+2021-08-13 14:49:02.058 32328-32328/com.example.imusic I/Process: Sending signal. PID: 32328 SIG: 9

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/search_history_details_menu"
+        android:title="Search..."
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView"
+        android:icon="@drawable/ic_search"/>
+
+    <item
+        android:id="@+id/clear_history_details_menu"
+        android:title="Clear History"
+        android:icon="@drawable/ic_baseline_delete"
+        app:showAsAction="ifRoom"/>
+
+    <item
+        android:title="More options"
+        android:icon="@drawable/ic_baseline_more_white"
+        app:showAsAction="ifRoom">
+
+        <menu>
+            <item
+                android:id="@+id/refresh_history_details_menu"
+                android:title="Refresh"/>
+        </menu>
+
+    </item>
+
+
+</menu>

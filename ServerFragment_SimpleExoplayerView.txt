@@ -1,0 +1,181 @@
+package com.example.imusic;
+
+
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
+import android.os.Bundle;
+import android.util.SparseArray;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import androidx.fragment.app.Fragment;
+
+import com.google.android.exoplayer2.MediaItem;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.MergingMediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
+import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.exoplayer2.upstream.DefaultHttpDataSource;
+import com.google.android.exoplayer2.util.Util;
+
+import at.huber.youtubeExtractor.VideoMeta;
+import at.huber.youtubeExtractor.YouTubeExtractor;
+import at.huber.youtubeExtractor.YtFile;
+
+
+public class ServerFragment extends Fragment {
+
+    PlayerView playerView;
+    SimpleExoPlayer player;
+    boolean playWhenReady = true;
+    int currentWindow = 0;
+    long playBackPosition = 0;
+    public String url = null;
+    public ImageView pasteBtn, searchBtn;
+    public EditText enteredURL;
+
+    public ServerFragment() {
+
+    }
+
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (Util.SDK_INT >= 24)
+            initPlayer();
+    }
+
+    @Override
+    public void onStop() {
+        if (Util.SDK_INT >= 24)
+            releasePlayer();
+        super.onStop();
+        
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (Util.SDK_INT < 24 || player == null)
+        {
+            initPlayer();
+            hideSystemUI();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        if (Util.SDK_INT < 24)
+            releasePlayer();
+        super.onPause();
+
+    }
+
+    private void hideSystemUI() {
+        playerView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LOW_PROFILE |
+                        View.SYSTEM_UI_FLAG_FULLSCREEN |
+                        View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY |
+                        View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+                        View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+    }
+
+    private void releasePlayer() {
+        if (player != null)
+        {
+            playWhenReady = player.getPlayWhenReady();
+            playBackPosition = player.getCurrentPosition();
+            currentWindow = player.getCurrentWindowIndex();
+            player.release();
+            player = null;
+        }
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_server, container, false);
+        pasteBtn = view.findViewById(R.id.pasteBtn);
+        searchBtn = view.findViewById(R.id.searchBtn);
+        enteredURL = view.findViewById(R.id.enteredURL);
+        playerView = view.findViewById(R.id.video_view);
+        initPlayer();
+
+        pasteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ClipboardManager manager = (ClipboardManager) getContext().getSystemService(Context.CLIPBOARD_SERVICE);
+                ClipData pasteData = manager.getPrimaryClip();
+                if (pasteData == null)
+                {
+                    Toast.makeText(getContext(), "Nothing to paste", Toast.LENGTH_SHORT).show();
+                }
+                else
+                {
+                    ClipData.Item item = pasteData.getItemAt(0);
+                    url = item.getText().toString();
+                    enteredURL.setText(url);
+                }
+            }
+        });
+        return view;
+    }
+
+    private void initPlayer() {
+        player = new SimpleExoPlayer.Builder(getContext()).build();
+        playerView.setPlayer(player);
+
+        playYoutubeVideo("https://www.youtube.com/watch?v=lxRwEPvL-mQ&list=RDMM&start_radio=1&rv=BLTwC8Ynb2o");
+    }
+
+    private void playYoutubeVideo(String youtubeUrl) {
+        new YouTubeExtractor(getContext())
+        {
+
+            @Override
+            protected void onExtractionComplete(SparseArray<YtFile> ytFiles, VideoMeta videoMeta) {
+                if (ytFiles != null)
+                {
+                    int videoTag = 137; //video tag for 1080p mp4
+                    int audioTag = 140; //audio tag for m4a
+                    MediaSource audioSource = new ProgressiveMediaSource
+                            .Factory(new DefaultHttpDataSource.Factory())
+                            .createMediaSource(MediaItem.fromUri(ytFiles.get(audioTag).getUrl()));
+
+                    MediaSource videoSource = new ProgressiveMediaSource
+                            .Factory(new DefaultHttpDataSource.Factory())
+                            .createMediaSource(MediaItem.fromUri(ytFiles.get(videoTag).getUrl()));
+                    player.setMediaSource(new MergingMediaSource(
+                            true,
+                            videoSource,
+                            audioSource),
+                            true
+                    );
+                    player.prepare();
+                    player.setPlayWhenReady(playWhenReady);
+                    player.seekTo(currentWindow, playBackPosition);
+                }
+            }
+        }.extract(youtubeUrl, false, true);
+
+    }
+
+
+}
+
+
+
+
+=================================================================================
+ //Exoplayer
+    implementation 'com.google.android.exoplayer:exoplayer:2.13.2'
+    //YouTube extractor
+    implementation 'com.github.HaarigerHarald:android-youtubeExtractor:v2.1.0'

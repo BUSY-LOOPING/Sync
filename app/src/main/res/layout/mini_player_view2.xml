@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/relative_layout_mini_player_visible"
+    android:layout_width="wrap_content"
+    android:layout_height="65dp"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ImageView
+        android:id="@+id/more_mini_player"
+        android:layout_width="40dp"
+        android:layout_height="35dp"
+        android:layout_alignParentEnd="true"
+        android:layout_centerVertical="true"
+        app:srcCompat="@drawable/ic_baseline_more"
+        android:layout_marginEnd="10dp"/>
+
+    <ToggleButton
+        android:scaleY="0.9"
+        android:scaleX="0.9"
+        android:id="@+id/toggle_img"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/more_mini_player"
+        android:background="@drawable/toggle_show_img"
+        android:text=""
+        android:textOff=""
+        android:textOn="" />
+
+    <androidx.appcompat.widget.SearchView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/toggle_img"
+        android:scaleX="1.2"
+        android:scaleY="1.2"
+        app:queryHint="Search media"
+        app:searchIcon="@drawable/ic_search" />
+
+
+</RelativeLayout>

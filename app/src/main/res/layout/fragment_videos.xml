@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:id="@+id/swipe_container_fragment_videos"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#111111">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:layoutAnimation="@anim/layout_animation"
+        android:id="@+id/recyclerView_fragment_videos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#111111"/>
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

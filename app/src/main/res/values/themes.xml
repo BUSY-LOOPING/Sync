@@ -1,0 +1,78 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+    <!-- Base application theme. -->
+    <style name="Theme.IMusic" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+        <!-- Primary brand color. -->
+        <item name="colorPrimary">@color/purple_500</item>
+        <item name="colorPrimaryVariant">@color/purple_700</item>
+        <item name="colorOnPrimary">#80FFFFFF</item>
+        <item name="colorAccent">@color/tab_highlight</item>
+        <!-- Secondary brand color. -->
+        <item name="colorSecondary">@color/teal_200</item>
+        <item name="colorSecondaryVariant">@color/teal_700</item>
+        <item name="colorOnSecondary">@color/color_primary_dark</item>
+        <!-- Status bar color. -->
+        <item name="android:statusBarColor" tools:targetApi="l">@color/color_primary</item>
+        <item name="android:fontFamily">@font/helvetica</item>
+        <item name="android:textColorPrimary">@color/colorAccent</item>
+        <item name="android:textColorHint">#80FFFFFF</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/color_primary</item>
+
+        <item name="popupMenuBackground">@drawable/my_popup_bg</item>
+        <item name="windowActionModeOverlay">true</item>
+        <item name="actionModeBackground">@color/color_primary</item>
+
+<!--        <item name="android:actionOverflowButtonStyle">@style/ActionButtonOverflow</item>-->
+<!--        <item name="actionOverflowButtonStyle">@style/ActionButtonOverflow</item>-->
+
+    </style>
+
+<!--    <style name="ActionButtonOverflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">-->
+<!--        <item name="android:tint">@color/white</item>-->
+<!--        <item name="navigationIcon">@drawable/ic_cancel_2</item>-->
+<!--    </style>-->
+
+
+    <!--    Bottom Sheet style-->
+    <style name="BottomSheetDialogTheme" parent="Theme.Design.Light.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyle</item>
+    </style>
+
+    <style name="BottomSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+    </style>
+
+    <style name="BottomSheetAddToPlaylist" parent="Theme.Design.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/BottomSheetStyleAddToPlaylist</item>
+    </style>
+
+    <style name="BottomSheetStyleAddToPlaylist" parent="Widget.Design.BottomSheet.Modal">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">#333333</item>
+    </style>
+
+    <style name="Spinner" parent="Widget.AppCompat.Light.DropDownItem.Spinner">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:backgroundTint" tools:targetApi="lollipop">#505050</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="SCBSwitch" parent="Theme.AppCompat.Light">
+        <!-- active thumb & track color (30% transparency) -->
+        <item name="colorControlActivated">#2196F3</item>
+
+        <!-- inactive thumb color -->
+        <item name="colorSwitchThumbNormal">#D3CFCF</item>
+
+        <!-- inactive track color (30% transparency) -->
+        <item name="android:colorForeground">#63F1F1F1</item>
+    </style>
+
+    <!-- Splash Screen theme -->
+    <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
+        <item name="android:background">@drawable/splash_screen</item>
+        <item name="android:windowAnimationStyle">@null</item>
+    </style>
+
+
+
+</resources>

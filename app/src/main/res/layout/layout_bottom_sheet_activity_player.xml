@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/bottomSheetContainer"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:background="@drawable/bottom_sheet_rounded"
+    android:layout_height="wrap_content">
+
+    <ImageView
+        android:layout_width="35dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_baseline_remove"
+        android:layout_gravity="center"/>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/addToPlaylistBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Add to Playlist"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:padding="15dp"
+            android:background="@drawable/custom_ripple_add_to_playlist"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/setAsRingtoneBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Set as Ringtone"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:padding="15dp"
+            android:background="@drawable/custom_ripple_add_to_playlist"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/equaliserBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Equaliser"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:padding="15dp"
+            android:background="@drawable/custom_ripple_add_to_playlist"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/viewDetailsBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="15dp"
+            android:gravity="center"
+            android:text="View Details"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:background="@drawable/custom_ripple_add_to_playlist"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/deleteMediaBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Delete Media"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:padding="15dp"
+            android:background="@drawable/custom_ripple_add_to_playlist"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:weightSum="7"
+        android:paddingTop="15dp"
+        android:paddingBottom="15dp">
+
+        <View
+            android:layout_weight="1"
+            android:layout_gravity="left"
+            android:layout_width="0dp"
+            android:layout_height="1dp" />
+
+        <View
+            android:layout_weight="5"
+            android:layout_gravity="center"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:background="@color/colorDivider"/>
+
+        <View
+            android:layout_weight="1"
+            android:layout_gravity="right"
+            android:layout_width="0dp"
+            android:layout_height="1dp" />
+
+    </LinearLayout>
+
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:clickable="true"
+        android:paddingBottom="10dp"
+        android:focusable="true">
+
+        <TextView
+            android:id="@+id/cancelBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Cancel"
+            android:textColor="@color/colorAccent"
+            android:textSize="16sp"
+            android:padding="15dp"
+            android:background="@drawable/custom_ripple_add_to_playlist"/>
+    </LinearLayout>
+
+</LinearLayout>

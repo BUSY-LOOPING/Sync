@@ -1,0 +1,729 @@
+package com.example.imusic;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.palette.graphics.Palette;
+
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Picture;
+import android.graphics.drawable.GradientDrawable;
+import android.media.MediaMetadataRetriever;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.SeekBar;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.bumptech.glide.Glide;
+import com.gauravk.audiovisualizer.visualizer.BarVisualizer;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
+import java.util.ArrayList;
+import java.lang.Thread;
+import java.util.Random;
+
+import static com.example.imusic.AlbumDetailsAdapter.albumFiles;
+import static com.example.imusic.ApplicationClass.ACTION_NEXT;
+import static com.example.imusic.ApplicationClass.ACTION_PLAY;
+import static com.example.imusic.ApplicationClass.ACTION_PREV;
+import static com.example.imusic.ApplicationClass.CHANNEL_ID_1;
+import static com.example.imusic.ApplicationClass.CHANNEL_ID_2;
+import static com.example.imusic.MainActivity.musicFiles;
+import static com.example.imusic.MainActivity.repeatBoolean;
+import static com.example.imusic.MainActivity.shuffleBoolean;
+
+public class PlayerActivity extends AppCompatActivity implements ActionPlaying, ServiceConnection {
+
+    TextView song_name, artist_name, duration_played, duration_total;
+    ImageView cover_art, nextBtn, prevBtn, backBtn, shuffleBtn, repeatBtn, menuBtn;
+    FloatingActionButton playPauseBtn;
+    SeekBar seekBar;
+    int position = -1;
+    static ArrayList<MusicFiles> listSongs = new ArrayList<>();
+    static Uri uri;
+    //  static MediaPlayer mediaPlayer;
+    private Handler handler = new Handler();
+    private Thread playThread;
+    private Thread prevThread;
+    static BarVisualizer barVisualizer;
+    static int audioSessionId;
+    MusicService musicService;
+    MediaSessionCompat mediaSessionCompat;
+    NotificationManager notificationManager;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_player);
+        mediaSessionCompat = new MediaSessionCompat(getBaseContext(), "My Audio");
+        initView();
+        getIntentMethod();
+        Log.d("mytag", "oncreate player activity called");
+
+
+        menuBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                BottomSheetDialog bottomSheetDialog = new BottomSheetDialog(
+                        PlayerActivity.this, R.style.BottomSheetDialogTheme
+                );
+
+                View bottomSheetView = LayoutInflater.from(getApplicationContext())
+                        .inflate(R.layout.layout_bottom_sheet_activity_player,
+                                (LinearLayout) findViewById(R.id.bottomSheetContainer));
+
+                bottomSheetDialog.setContentView(bottomSheetView);
+                bottomSheetDialog.show();
+
+                bottomSheetView.findViewById(R.id.addToPlaylistBtn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(PlayerActivity.this, "Add to Playlist Pressed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                bottomSheetView.findViewById(R.id.setAsRingtoneBtn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(PlayerActivity.this, "Set as Ringtone pressed", Toast.LENGTH_SHORT).show();
+//                        File ringtoneFile = new File(listSongs.get(position).getTitle());
+//                        ContentValues content = new ContentValues();
+//                        content.put(MediaStore.MediaColumns.DATA,ringtoneFile.getAbsolutePath());
+//                        content.put(MediaStore.MediaColumns.TITLE, listSongs.get(position).getTitle());
+//                        content.put(MediaStore.MediaColumns.SIZE, 215454);
+//                        content.put(MediaStore.MediaColumns.MIME_TYPE, "audio/*");
+//                        content.put(MediaStore.Audio.Media.ARTIST, "artist");
+//                        content.put(MediaStore.Audio.Media.DURATION, 230);
+//                        content.put(MediaStore.Audio.Media.IS_RINGTONE, true);
+//                        content.put(MediaStore.Audio.Media.IS_NOTIFICATION, false);
+//                        content.put(MediaStore.Audio.Media.IS_ALARM, false);
+//                        content.put(MediaStore.Audio.Media.IS_MUSIC, false);
+//
+//                        Uri uri = MediaStore.Audio.Media.getContentUriForPath(
+//                                ringtoneFile.getAbsolutePath());
+//                        Log.i("absolutepath","uri" + uri);
+//                        Uri newUri = PlayerActivity.this.getContentResolver().insert(uri, content);
+//                        Log.i("absolutepath","newUri" + newUri);
+//                        RingtoneManager.setActualDefaultRingtoneUri(PlayerActivity.this,
+//                                RingtoneManager.TYPE_RINGTONE,newUri);
+                    }
+
+                });
+
+                bottomSheetView.findViewById(R.id.viewDetailsBtn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(PlayerActivity.this, InfoActivity.class);
+                        startActivity(intent);
+                        bottomSheetDialog.cancel();
+                    }
+                });
+
+                bottomSheetView.findViewById(R.id.deleteMediaBtn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(PlayerActivity.this, "Delete Media Pressed", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                bottomSheetView.findViewById(R.id.cancelBtn).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        bottomSheetDialog.dismiss();
+                    }
+                });
+
+            }
+        });
+        backBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (musicService != null && fromUser == true) {
+                    musicService.seekTo(progress * 1000);
+                }
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+        Thread tempThread = new Thread() {
+            @Override
+            public void run() {
+                if (musicService != null) {
+                    int mCurrentPosition = musicService.getCurrentPosition() / 1000;
+                    seekBar.setProgress(mCurrentPosition);
+                    duration_played.setText(formattedTime(mCurrentPosition));
+                }
+                handler.post(this); //if we dont write this statement the textview of currentDuration wont change
+            }
+        };
+        tempThread.start();
+        shuffleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (shuffleBoolean) {
+                    shuffleBoolean = false;
+                    shuffleBtn.setImageResource(R.drawable.ic_shuffle_off);
+                } else {
+                    shuffleBoolean = true;
+                    shuffleBtn.setImageResource(R.drawable.ic_shuffle_on);
+                }
+            }
+        });
+        repeatBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (repeatBoolean) {
+                    repeatBoolean = false;
+                    repeatBtn.setImageResource(R.drawable.ic_repeat_off);
+                } else {
+                    repeatBoolean = true;
+                    repeatBtn.setImageResource(R.drawable.ic_repeat_on);
+                }
+            }
+        });
+    }
+
+    //these 2 methods will allow music to keep getting played even if orientation changes
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putInt("possition", musicService.getCurrentPosition());
+        super.onSaveInstanceState(outState);
+    }
+
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        int pos = savedInstanceState.getInt("possition");
+        musicService.seekTo(pos);
+        super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume() {
+        Intent intent = new Intent(this, MusicService.class);
+        bindService(intent, this, BIND_AUTO_CREATE);
+        playThreadBtn();
+        nextThreadBtn();
+        prevThreadBtn();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unbindService(this);
+    }
+
+    private void prevThreadBtn() {
+        prevThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                prevBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        prevBtnClicked();
+                    }
+                });
+            }
+        };
+        prevThread.start();
+    }
+
+    public void prevBtnClicked() {
+        if (musicService.isPlaying()) {
+            musicService.stop();
+            musicService.release();
+            if (shuffleBoolean && !repeatBoolean) {
+                position = getRandomNumber(listSongs.size() - 1);
+            } else if (!shuffleBoolean && !repeatBoolean) {
+                position = ((position - 1) < 0 ? (listSongs.size() - 1) : (position - 1));
+            }
+
+            uri = Uri.parse(listSongs.get(position).getPath());
+            musicService.createMediaPlayer(position);
+            metaData(uri);
+            song_name.setText(listSongs.get(position).getTitle());
+            artist_name.setText(listSongs.get(position).getArtist());
+            seekBar.setMax(musicService.getDuration() / 1000);
+            PlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (musicService != null) {
+                        int mCurrentPosition = musicService.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                    }
+                    handler.post(this);
+                }
+
+            });
+            musicService.OnCompleted();
+            showNotification(R.drawable.ic_pause);
+            playPauseBtn.setBackgroundResource(R.drawable.ic_pause);
+            musicService.start();
+        } else {
+            musicService.stop();
+            musicService.release();
+            if (shuffleBoolean && !repeatBoolean) {
+                position = getRandomNumber(listSongs.size() - 1);
+            } else if (!shuffleBoolean && !repeatBoolean) {
+                position = ((position - 1) < 0 ? (listSongs.size() - 1) : (position - 1));
+            }
+            uri = Uri.parse(listSongs.get(position).getPath());
+            musicService.createMediaPlayer(position);
+            metaData(uri);
+            song_name.setText(listSongs.get(position).getTitle());
+            artist_name.setText(listSongs.get(position).getArtist());
+            seekBar.setMax(musicService.getDuration() / 1000);
+            PlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (musicService != null) {
+                        int mCurrentPosition = musicService.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                    }
+                    handler.post(this);
+                }
+
+            });
+            musicService.OnCompleted();
+            showNotification(R.drawable.ic_play);
+            playPauseBtn.setBackgroundResource(R.drawable.ic_play);
+        }
+        audioSessionId = musicService.getAudioSessionId();
+        if (audioSessionId != -1) {
+            barVisualizer.setAudioSessionId(audioSessionId);
+        }
+    }
+
+
+    private void nextThreadBtn() {
+        Thread nextThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                nextBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        nextBtnClicked();
+                    }
+                });
+            }
+        };
+        nextThread.start();
+    }
+
+    public void nextBtnClicked() {
+        if (musicService.isPlaying()) {
+            musicService.stop();
+            musicService.release();
+            if (shuffleBoolean && !repeatBoolean) {
+                position = getRandomNumber(listSongs.size() - 1);
+            } else if (!shuffleBoolean && !repeatBoolean) {
+                position = ((position + 1) % listSongs.size());
+            }
+
+            uri = Uri.parse(listSongs.get(position).getPath());
+            musicService.createMediaPlayer(position);
+            metaData(uri);
+            song_name.setText(listSongs.get(position).getTitle());
+            artist_name.setText(listSongs.get(position).getArtist());
+            seekBar.setMax(musicService.getDuration() / 1000);
+            PlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (musicService != null) {
+                        int mCurrentPosition = musicService.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                    }
+                    handler.post(this);
+                }
+
+            });
+            musicService.OnCompleted();
+            showNotification(R.drawable.ic_pause);
+            playPauseBtn.setBackgroundResource(R.drawable.ic_pause);
+            musicService.start();
+        } else {
+            musicService.stop();
+            musicService.release();
+            if (shuffleBoolean && !repeatBoolean) {
+                position = getRandomNumber(listSongs.size() - 1);
+            } else if (!shuffleBoolean && !repeatBoolean) {
+                position = ((position + 1) % listSongs.size());
+            }
+            uri = Uri.parse(listSongs.get(position).getPath());
+            musicService.createMediaPlayer(position);
+            metaData(uri);
+            song_name.setText(listSongs.get(position).getTitle());
+            artist_name.setText(listSongs.get(position).getArtist());
+            seekBar.setMax(musicService.getDuration() / 1000);
+            PlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (musicService != null) {
+                        int mCurrentPosition = musicService.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                    }
+                    handler.post(this);
+                }
+
+            });
+            musicService.OnCompleted();
+            showNotification(R.drawable.ic_play);
+            playPauseBtn.setBackgroundResource(R.drawable.ic_play);
+        }
+        audioSessionId = musicService.getAudioSessionId();
+        if (audioSessionId != -1) {
+            barVisualizer.setAudioSessionId(audioSessionId);
+        }
+
+    }
+
+    private int getRandomNumber(int i) {
+        Random random = new Random();
+        return random.nextInt(i + 1);  //it will generate random numbers btw 0 and size -1
+    }
+
+
+    public void playPauseBtnClicked() {
+        if (musicService.isPlaying()) {
+            showNotification(R.drawable.ic_play);
+            playPauseBtn.setImageResource(R.drawable.ic_play);
+            musicService.pause();
+            seekBar.setMax(musicService.getDuration() / 1000);
+            PlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (musicService != null) {
+                        int mCurrentPosition = musicService.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                    }
+                    handler.post(this);
+                }
+
+            });
+        } else {
+            showNotification(R.drawable.ic_pause);
+            playPauseBtn.setImageResource(R.drawable.ic_pause);
+            musicService.start();
+            seekBar.setMax(musicService.getDuration() / 1000);
+            PlayerActivity.this.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (musicService != null) {
+                        int mCurrentPosition = musicService.getCurrentPosition() / 1000;
+                        seekBar.setProgress(mCurrentPosition);
+                    }
+                    handler.postDelayed(this, 1000);
+                }
+
+            });
+
+        }
+    }
+
+    private void playThreadBtn() {
+        playThread = new Thread() {
+            @Override
+            public void run() {
+                super.run();
+                playPauseBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        playPauseBtnClicked();
+                    }
+                });
+            }
+        };
+        playThread.start();
+    }
+
+    private String formattedTime(int mCurrentPosition) {  //mCurrentPosition is in seconds
+        String totalout = "";
+        String totalnew = "";
+        String seconds = String.valueOf(mCurrentPosition % 60);
+        String minutes = String.valueOf(mCurrentPosition / 60);
+        totalout = minutes + ":" + seconds;
+        totalnew = minutes + ":" + "0" + seconds;
+        if (seconds.length() == 1) {
+            return totalnew;
+        } else
+            return totalout;
+    }
+
+    private void getIntentMethod() {
+        position = getIntent().getIntExtra("position", -1);
+        String sender = getIntent().getStringExtra("sender");
+        if (sender != null && sender.equals("albumDetails")) {
+            listSongs = albumFiles;
+        } else {
+            listSongs = musicFiles;
+        }
+        if (listSongs != null) {
+            playPauseBtn.setImageResource(R.drawable.ic_pause);
+            uri = Uri.parse(listSongs.get(position).getPath());
+        }
+        showNotification(R.drawable.ic_pause);
+        Intent intent = new Intent(this, MusicService.class);
+        intent.putExtra("servicePosition", position);
+        startService(intent);
+    }
+
+    private void initView() {
+        barVisualizer = findViewById(R.id.bar);
+        menuBtn = findViewById(R.id.menu_btn);
+        song_name = findViewById(R.id.song_name);
+        artist_name = findViewById(R.id.song_artist);
+        duration_played = findViewById(R.id.duratinPlayed);
+        duration_total = findViewById(R.id.duratinTotal);
+        cover_art = findViewById(R.id.cover_art);
+        nextBtn = findViewById(R.id.id_next);
+        prevBtn = findViewById(R.id.id_prev);
+        backBtn = findViewById(R.id.back_btn);
+        shuffleBtn = findViewById(R.id.id_shuffle);
+        repeatBtn = findViewById(R.id.id_repeat);
+        playPauseBtn = findViewById(R.id.play_pause);
+        seekBar = findViewById(R.id.seekBar);
+    }
+
+
+    private void metaData(Uri uri) {
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+        retriever.setDataSource(getApplicationContext(), uri);
+        int mTotalDuration = musicService.getDuration() / 1000;
+        duration_total.setText(formattedTime(mTotalDuration));
+        byte[] art = retriever.getEmbeddedPicture();
+        Bitmap bitmap;
+        if (art != null) {
+            bitmap = BitmapFactory.decodeByteArray(art, 0, art.length);
+            ImageAnimation(this, cover_art, bitmap);
+            Palette.from(bitmap).generate(new Palette.PaletteAsyncListener() {
+                @Override
+                public void onGenerated(@Nullable Palette palette) {
+                    Palette.Swatch swatch = palette.getDominantSwatch();
+                    if (swatch != null) {
+                        ImageView gradient = findViewById(R.id.imageViewGradient);
+                        RelativeLayout mContainer = findViewById(R.id.mContainer);
+                        gradient.setBackgroundResource(R.drawable.gradient_bg);
+                        mContainer.setBackgroundResource(R.drawable.main_bg);
+                        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                new int[]{swatch.getRgb(), 0x00000000});
+
+                        gradient.setBackground(gradientDrawable);
+                        GradientDrawable gradientDrawableBg = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP, //orientation is from bottom to top
+                                new int[]{swatch.getRgb(), swatch.getRgb()});  //start color , end color
+                        mContainer.setBackground(gradientDrawableBg);
+
+                        song_name.setTextColor(swatch.getTitleTextColor());
+                        artist_name.setTextColor(swatch.getBodyTextColor());
+                        barVisualizer.setColor(swatch.getBodyTextColor());
+                    } else {
+                        ImageView gradient = findViewById(R.id.imageViewGradient);
+                        RelativeLayout mContainer = findViewById(R.id.mContainer);
+                        gradient.setBackgroundResource(R.drawable.gradient_bg);
+                        mContainer.setBackgroundResource(R.drawable.main_bg);
+                        GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                new int[]{0xff000000, 0x00000000});
+                        gradient.setBackground(gradientDrawable);
+                        GradientDrawable gradientDrawableBg = new GradientDrawable(GradientDrawable.Orientation.BOTTOM_TOP,
+                                new int[]{0xff000000, 0xff000000});
+                        mContainer.setBackground(gradientDrawableBg);
+                        song_name.setTextColor(Color.WHITE);
+                        artist_name.setTextColor(Color.DKGRAY);
+                    }
+                }
+            });
+        } else {
+            bitmap = BitmapFactory.decodeResource(this.getResources(), R.drawable.music_icon);
+            ImageAnimation(this, cover_art, bitmap);
+            ImageView gradient = findViewById(R.id.imageViewGradient);
+            RelativeLayout mContainer = findViewById(R.id.mContainer);
+            gradient.setBackgroundResource(R.drawable.gradient_bg);
+            mContainer.setBackgroundResource(R.drawable.main_bg);
+            song_name.setTextColor(Color.WHITE);
+            artist_name.setTextColor(Color.DKGRAY);
+            barVisualizer.setColor(getResources().getColor(R.color.music_item_bg));
+        }
+    }
+
+    public void ImageAnimation(Context context, ImageView imageView, Bitmap bitmap) {
+        Animation animOut = AnimationUtils.loadAnimation(context, android.R.anim.fade_out);
+        Animation animIn = AnimationUtils.loadAnimation(context, android.R.anim.fade_in);
+        animOut.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+
+            }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                Glide.with(context).load(bitmap).into(imageView);
+//                animIn.setAnimationListener(new Animation.AnimationListener() {
+//                    @Override
+//                    public void onAnimationStart(Animation animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationEnd(Animation animation) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onAnimationRepeat(Animation animation) {
+//
+//                    }
+//                });
+                imageView.startAnimation(animIn);
+
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+
+            }
+        });
+        imageView.startAnimation(animOut);
+    }
+
+//    @Override
+//    public void onCompletion(MediaPlayer mp) {
+//        nextBtnClicked();
+//        if (musicService != null) {
+//            musicService.createMediaPlayer(position);
+//            audioSessionId = musicService.getAudioSessionId();
+//            if (audioSessionId != -1) {
+//                barVisualizer.setAudioSessionId(audioSessionId);
+//            }
+//            musicService.start();
+//            musicService.OnCompleted();
+//        }
+//    }
+
+    @Override
+    public void onServiceConnected(ComponentName name, IBinder service) {
+        MusicService.MyBinder binder = (MusicService.MyBinder) service;
+        musicService = binder.getService();
+        musicService.setCallBack(this);
+        Toast.makeText(musicService, "Connected " + musicService, Toast.LENGTH_SHORT).show();
+        seekBar.setMax(musicService.getDuration() / 1000);
+        metaData(uri);
+        audioSessionId = musicService.getAudioSessionId();
+        if (audioSessionId != -1) {
+            barVisualizer.setAudioSessionId(audioSessionId);
+        }
+        song_name.setText(listSongs.get(position).getTitle());
+        artist_name.setText(listSongs.get(position).getArtist());
+        musicService.OnCompleted();
+    }
+
+    @Override
+    public void onServiceDisconnected(ComponentName name) {
+        musicService = null;
+    }
+
+    void showNotification(int playPauseBtn) {
+
+        Intent intent = new Intent(this, PlayerActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, intent, 0);
+
+        Intent pauseIntent = new Intent(this, NotificationReceiver.class)
+                .setAction(ACTION_PLAY);
+        PendingIntent pausePendingIntent = PendingIntent.getBroadcast(this, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent prevIntent = new Intent(this, NotificationReceiver.class)
+                .setAction(ACTION_PREV);
+        PendingIntent prevPendingIntent = PendingIntent.getBroadcast(this, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        Intent nextIntent = new Intent(this, NotificationReceiver.class)
+                .setAction(ACTION_NEXT);
+        PendingIntent nextPendingIntent = PendingIntent.getBroadcast(this, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        byte[] picture = null;
+        picture = getAlbumArt(listSongs.get(position).getPath());
+        Bitmap thumb = null;
+        if (picture != null) {
+            thumb = BitmapFactory.decodeByteArray(picture, 0, picture.length);
+        } else {
+            thumb = BitmapFactory.decodeResource(getResources(), R.drawable.music_icon);
+        }
+
+        Notification notification = new NotificationCompat.Builder(this, CHANNEL_ID_2)
+                .setSmallIcon(playPauseBtn)
+                .setLargeIcon(thumb)
+                .setContentTitle(listSongs.get(position).getTitle())
+                .setContentText(listSongs.get(position).getArtist())
+                .addAction(R.drawable.ic_skip_previous, "Previous", prevPendingIntent)
+                .addAction(playPauseBtn, "Pause", pausePendingIntent)
+                .addAction(R.drawable.ic_skip_next, "Next", nextPendingIntent)
+                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                        .setMediaSession(mediaSessionCompat.getSessionToken()))
+                .build();
+
+
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        notificationManager.notify(0, notification);
+
+    }
+
+    private byte[] getAlbumArt(String uri) {
+        byte[] art = null;
+        try {
+            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
+            retriever.setDataSource(this, Uri.parse(uri));
+            art = retriever.getEmbeddedPicture();
+            retriever.release();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
+        return art;
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (barVisualizer != null) {
+            barVisualizer.release();
+        }
+        if (!musicService.isPlaying())
+            notificationManager.cancel(0);
+        super.onDestroy();
+    }
+}

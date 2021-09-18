@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/play_contextual_menu_videoAdapter"
+        android:icon="@drawable/exo_icon_play"
+        android:iconTint="@color/white"
+        android:title=""
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/append_contextual_menu_videoAdapter"
+        android:icon="@drawable/ic_baseline_playlist_add_24"
+        android:iconTint="@color/white"
+        android:title=""
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:title=""
+        app:showAsAction="never"
+        android:icon="@drawable/ic_baseline_more_white">
+        <menu>
+            <item
+                android:id="@+id/add_to_playlist_contextual_menu_videoAdapter"
+                android:title="Add to playlist" />
+            <item
+                android:id="@+id/browse_parent_contextual_menu_videoAdapter"
+                android:title="Browse parent" />
+        </menu>
+    </item>
+
+</menu>

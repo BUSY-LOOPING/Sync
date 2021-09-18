@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/info_contextual_menu_music_adapter"
+        android:icon="@drawable/ic_baseline_info"
+        android:title="info"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/share_contextual_menu_music_adapter"
+        android:icon="@drawable/share"
+        android:title="info"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/play_contextual_menu_music_adapter"
+        android:icon="@drawable/exo_icon_play"
+        android:iconTint="@color/white"
+        android:title="info"
+        app:showAsAction="always" />
+
+    <item
+        android:title=""
+        app:showAsAction="always"
+        android:icon="@drawable/ic_baseline_more_white">
+
+        <menu>
+
+            <item
+                android:id="@+id/add_to_playlist_contextual_menu_musicAdapter"
+                android:title="Add to playlist"/>
+            <item
+                android:id="@+id/delete_contextual_menu_musicAdapter"
+                android:title="Delete"/>
+            <item
+                android:id="@+id/setAsRingtone_contextual_menu_musicAdapter"
+                android:title="Set as ringtone"/>
+            <item
+                android:id="@+id/browse_parent_contextual_menu_musicAdapter"
+                android:title="Browse parent"/>
+
+        </menu>
+
+    </item>
+
+</menu>

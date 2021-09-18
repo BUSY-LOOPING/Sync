@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/search_file_menu"
+        android:icon="@drawable/ic_search"
+        android:title="Search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
+
+    <item
+        android:id="@+id/fav_icon_file_menu"
+        android:checkable="true"
+        android:icon="@drawable/ic_baseline_star_border"
+        android:title="Favourite"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:icon="@drawable/ic_baseline_more_white"
+        android:title=""
+        app:showAsAction="ifRoom">
+        <menu>
+            <item
+                android:id="@+id/sort_by_file_menu"
+                android:title="Sort By">
+                <menu>
+                    <item
+                        android:id="@+id/sort_by_name_file_menu"
+                        android:title="Name" />
+                    <item
+                        android:id="@+id/sort_by_size_file_menu"
+                        android:title="Size" />
+                </menu>
+            </item>
+
+            <item
+                android:id="@+id/add_to_playlist_file_menu"
+                android:title="Add to playlist">
+                <menu>
+                    <item
+                        android:id="@+id/add_this_folder_n_subfoldes"
+                        android:title="Add this folder and subfolders" />
+                </menu>
+            </item>
+
+            <item
+                android:id="@+id/show_all_files"
+                android:checkable="true"
+                android:checked="true"
+                android:title="Show all files    " />
+
+            <item
+                android:id="@+id/show_hidden_files"
+                android:checkable="true"
+                android:checked="true"
+                android:title="Show hidden files    " />
+
+            <item
+                android:id="@+id/refresh_file_menu"
+                android:title="Refresh" />
+
+        </menu>
+    </item>
+
+</menu>
