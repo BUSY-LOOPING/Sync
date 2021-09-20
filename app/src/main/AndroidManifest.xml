@@ -26,6 +26,9 @@
         android:theme="@style/Theme.IMusic"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".InfoActivityVideo"
+            android:exported="true" />
+        <activity
             android:name=".HistoryDetailsActivity"
             android:exported="true" />
         <activity

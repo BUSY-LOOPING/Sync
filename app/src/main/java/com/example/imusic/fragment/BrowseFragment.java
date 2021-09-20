@@ -9,7 +9,6 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,9 +37,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BrowseFragment extends Fragment {
-    private Context context;
     public static List<File> favorites;
     public static BrowseAdapter browseAdapter;
+    private Context context;
     private RecyclerView recyclerView;
     private File internalStorageFile;
     private File externalStorageFile;
@@ -50,6 +49,14 @@ public class BrowseFragment extends Fragment {
     private DataBaseHelper mydb;
 
     public BrowseFragment() {
+    }
+
+    public static BrowseFragment newInstance() {
+
+        Bundle args = new Bundle();
+        BrowseFragment fragment = new BrowseFragment();
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Override
@@ -75,7 +82,6 @@ public class BrowseFragment extends Fragment {
     private ArrayList<File> getFavourites() {
         Cursor res = mydb.getAllData();
         if (res.getCount() == 0) {
-            Log.d("mydb", "getFavoirutes returns null");
             return null;
         }
         ArrayList<File> temp = new ArrayList<>();
@@ -83,8 +89,8 @@ public class BrowseFragment extends Fragment {
             File file = new File(res.getString(2));
             if (file.exists()) {
                 temp.add(file);
-                Log.d("mydb", "name " + file.getName());
-            }
+            } else
+                mydb.deleteData(res.getString(2));
         }
         return temp;
     }
@@ -103,15 +109,6 @@ public class BrowseFragment extends Fragment {
             editor.clear();
             editor.apply();
         }
-    }
-
-
-    public static BrowseFragment newInstance() {
-
-        Bundle args = new Bundle();
-        BrowseFragment fragment = new BrowseFragment();
-        fragment.setArguments(args);
-        return fragment;
     }
 
     @Override
@@ -155,9 +152,20 @@ public class BrowseFragment extends Fragment {
 
 //        Map<String, File> externalLocations = ExternalStorage.getAllStorageLocations();
 //        externalStorageFile = externalLocations.get(ExternalStorage.EXTERNAL_SD_CARD);
-        File extdir = Environment.getExternalStorageDirectory();
-        externalStorageFile = new File(extdir.getAbsolutePath());
-
+//        File extdir = Environment.getExternalStorageDirectory();
+//        externalStorageFile = new File(extdir.getAbsolutePath());
+        externalStorageFile = Environment.getExternalStorageDirectory().getParentFile();
+        if (externalStorageFile != null) {
+            String[] list = externalStorageFile.list();
+            if (list == null || list.length == 0)
+                externalStorageFile = Environment.getExternalStorageDirectory().getParentFile().getParentFile();
+            if (externalStorageFile != null) {
+                File[] listFile = externalStorageFile.listFiles();
+                if (listFile != null && listFile.length > 0) {
+                    externalStorageFile = listFile[0];
+                }
+            }
+        }
 
         ViewStub stub = view.findViewById(id);
         stub.setLayoutResource(R.layout.fav_files_item);
@@ -224,11 +232,10 @@ public class BrowseFragment extends Fragment {
 
     private void initInternalStorageViewStub(View view, int id) {
 
-        String internalStoragePath = System.getenv("EXTERNAL_STORAGE");
-        if (internalStoragePath != null) {
-            internalStorageFile = new File(internalStoragePath);
-        }
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//        String internalStoragePath = System.getenv("EXTERNAL_STORAGE");
+        String internalStoragePath = Environment.getExternalStorageDirectory().getPath();
+        internalStorageFile = new File(internalStoragePath);
+        //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
 //            Uri returnUri = Uri.fromFile(internalStorageFile);
 //
 //            Cursor returnCursor = context.getContentResolver().query(returnUri, new String[]{

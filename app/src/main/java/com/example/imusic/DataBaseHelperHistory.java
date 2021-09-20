@@ -16,18 +16,11 @@ public class DataBaseHelperHistory extends SQLiteOpenHelper {
     private HistoryDetailsActivityAdapter historyDetailsActivityAdapter;
     public static final String HISTORY_TABLE_NAME = "history";
     private Context context;
-    private Thread thread;
-    private final Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            check();
-        }
-    };
 
     public DataBaseHelperHistory(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         this.context = context;
-        check();
+//        check();
 //        thread = new Thread(runnable);
 //        thread.start();
     }
@@ -113,18 +106,10 @@ public class DataBaseHelperHistory extends SQLiteOpenHelper {
         if (cursor != null) {
             while (cursor.moveToNext()) {
                 if (delete(id) != -1) {
-                    if (adapter != null) {
-                        if (isAudio) {
-                            adapter.remove(id);
-                            if (historyDetailsActivityAdapter != null)
-                                historyDetailsActivityAdapter.remove(id);
-//                            adapter.remove(new PlaylistFiles(new MusicFiles(path, title, artist, album, duration, id, size),""));
-                        } else
-                            adapter.remove(id);
-                        if (historyDetailsActivityAdapter != null)
-                            historyDetailsActivityAdapter.remove(id);
-//                            adapter.remove(new PlaylistFiles(new VideoFiles(id, path, title, filename, size, dateAdded, duration, resolution), ""));
-                    }
+                    if (adapter != null)
+                        adapter.remove(id);
+                    if (historyDetailsActivityAdapter != null)
+                        historyDetailsActivityAdapter.remove(id);
                 }
             }
             cursor.close();
@@ -141,6 +126,16 @@ public class DataBaseHelperHistory extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(HISTORY_TABLE_NAME, " id = ? ", new String[]{id});
 //        db.close();
+    }
+
+    public void delete_notify(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(HISTORY_TABLE_NAME, " id = ? ", new String[]{id});
+        if (adapter != null) {
+            adapter.remove(id);
+        }
+        if (historyDetailsActivityAdapter != null)
+            historyDetailsActivityAdapter.remove(id);
     }
 
 

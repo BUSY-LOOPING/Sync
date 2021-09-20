@@ -29,7 +29,7 @@ import java.util.ArrayList;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryAdapterViewHolder> implements DeleteMusicFile{
     private Context mContext;
     private ArrayList<PlaylistFiles> playlistFiles;
-    private DataBaseHelperHistory db;
+    private final DataBaseHelperHistory db;
     private RecyclerView recyclerView;
 
 
@@ -65,7 +65,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryA
 
     @Override
     public void onBindViewHolder(@NonNull HistoryAdapterViewHolder holder, int position) {
-        db = new DataBaseHelperHistory(mContext, "history.db", null, 1);
+//        db = new DataBaseHelperHistory(mContext, "history.db", null, 1);
         holder.name.setText(playlistFiles.get(holder.getAdapterPosition()).isMusicFile ? playlistFiles.get(holder.getAdapterPosition()).getMusicFiles().getTitle() : playlistFiles.get(holder.getAdapterPosition()).getVideoFiles().getFilename());
         if (playlistFiles.get(holder.getAdapterPosition()).isVideoFile) {
             holder.details.setText(playlistFiles.get(holder.getAdapterPosition()).getVideoFiles().getResolutionInGeneral() == null ? playlistFiles.get(holder.getAdapterPosition()).getVideoFiles().getResolution() : playlistFiles.get(holder.getAdapterPosition()).getVideoFiles().getResolutionInGeneral());
@@ -115,7 +115,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryA
                         .into(holder.album_art);
             }
         }
-        db.close();
+//        db.close();
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -208,9 +208,11 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryA
     public void add(PlaylistFiles playlistFiles) {
         this.playlistFiles.add(playlistFiles);
         notifyItemInserted(this.playlistFiles.size() - 1);
-//        if (recyclerView.getLayoutManager() != null) {
-//            if (((LinearLayoutManager) recyclerView.getLayoutManager()).findFirstVisibleItemPosition() != this.playlistFiles.size())
-//                recyclerView.smoothScrollToPosition(this.playlistFiles.size());
-//        }
+    }
+
+    public void removeAll() {
+        int size = playlistFiles.size();
+        notifyItemRangeRemoved(0, size);
+        playlistFiles.clear();
     }
 }

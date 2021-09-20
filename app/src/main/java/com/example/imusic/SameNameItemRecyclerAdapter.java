@@ -28,12 +28,12 @@ import java.io.File;
 import java.util.ArrayList;
 
 public class SameNameItemRecyclerAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private Context mContext;
+    private final Context mContext;
     //    private ArrayList<PlaylistFiles> playlistFiles;
     //    private ArrayList<String> playListNames;
 //    private ArrayList<Integer> number_media;
     private ArrayList<SameNamePlaylistFiles> sameNamePlaylistFiles;
-    private RecyclerView recyclerView;
+    private final RecyclerView recyclerView;
     private final int FIRST_HOLDER = 0;
     private final int SECOND_HOLDER = 1;
     boolean flag = false;

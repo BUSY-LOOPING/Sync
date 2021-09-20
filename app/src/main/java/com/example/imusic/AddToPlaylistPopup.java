@@ -320,7 +320,6 @@ public class AddToPlaylistPopup extends BottomSheetDialogFragment {
                 String id = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media._ID));
                 String size = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.SIZE));
                 String date_added = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATE_ADDED));
-                Log.d("playlist", "music file in dir : " + parent.getAbsolutePath() + " : " + title);
 
                 if (path != null) {
                     MusicFiles musicFiles = new MusicFiles(path, title, artist, album, duration, id, size);

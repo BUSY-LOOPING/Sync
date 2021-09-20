@@ -45,7 +45,6 @@ public class MusicFragment extends Fragment {
     }
 
 
-
 //    @Override
 //    public void onDetach() {
 //        try {

@@ -147,7 +147,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
 
-
     public class MyBinder extends Binder {
         MusicService getService() {
 //            MiniPlayer.setFlag(false);
@@ -291,21 +290,28 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     @Override
     public void onCompletion(MediaPlayer mp) {
-        if (actionPlaying != null) {
-            actionPlaying.nextBtnClicked(true);
-            if (mediaPlayer != null) {
-                createMediaPlayer(position);
-                audioSessionId = getAudioSessionId();
-                if (audioSessionId != -1) {
-                    barVisualizer.setAudioSessionId(audioSessionId);
+        if (musicFiles.size() > 1 || (!is_mediaPlayerNull() && mediaPlayer.getDuration() > 10000)) {
+            if (actionPlaying != null) {
+                actionPlaying.nextBtnClicked(true);
+                if (mediaPlayer != null) {
+                    createMediaPlayer(position);
+                    audioSessionId = getAudioSessionId();
+                    if (audioSessionId != -1) {
+                        barVisualizer.setAudioSessionId(audioSessionId);
+                    }
+                    mediaPlayer.start();
+                    editor.putString(NOW_PLAYING, "true");
+                    editor.apply();
+                    playing = true;
+                    initiated = true;
+                    showNotification(R.drawable.ic_pause);
+                    OnCompleted();
                 }
-                mediaPlayer.start();
-                editor.putString(NOW_PLAYING, "true");
-                editor.apply();
-                playing = true;
-                initiated = true;
-                showNotification(R.drawable.ic_pause);
-                OnCompleted();
+            }
+        } else {
+            if (actionPlaying != null) {
+                if (mediaPlayer != null) mediaPlayer.start();
+                actionPlaying.playPauseBtnClicked();
             }
         }
     }

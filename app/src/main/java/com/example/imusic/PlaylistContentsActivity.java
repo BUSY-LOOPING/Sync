@@ -48,7 +48,6 @@ public class PlaylistContentsActivity extends AppCompatActivity implements Playl
 
             Collections.swap(playlistFiles, fromPosition, toPosition);
             adapter.notifyItemMoved(fromPosition, toPosition);
-
             return true;
         }
 

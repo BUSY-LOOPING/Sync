@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/info_contextual_menu_history"
+        android:title="Information"
+        android:icon="@drawable/ic_baseline_info"
+        app:showAsAction="always"/>
+
+    <item
+        android:id="@+id/play_contextual_menu_history"
+        android:icon="@drawable/exo_icon_play"
+        android:iconTint="@color/white"
+        android:title="Play"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/append_contextual_menu_history"
+        android:icon="@drawable/ic_baseline_playlist_add_24"
+        android:iconTint="@color/white"
+        android:title="Append"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/browse_parent_contextual_menu_history"
+        android:title="Browse parent"
+        android:icon="@drawable/ic_baseline_folder_24"
+        app:iconTint="@color/white"
+        app:showAsAction="always"/>
+
+</menu>

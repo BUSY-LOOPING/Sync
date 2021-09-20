@@ -34,23 +34,21 @@ import com.example.imusic.VideoFiles;
 import com.google.android.material.card.MaterialCardView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 
 public class MoreFragment extends Fragment {
+    public static final String HISTORY_FILES = "history_files";
+    public static HistoryAdapter historyAdapter;
     private Context context;
     private Button settings;
     private FragmentActivity myContext;
     private FloatingActionButton fab;
     private MaterialCardView newStreamBtn;
     private RecyclerView recyclerView;
-    public static HistoryAdapter historyAdapter;
     private ImageView arrow;
     private ArrayList<PlaylistFiles> playlistFiles;
-
-    public static final String HISTORY_FILES = "history_files";
 
     public MoreFragment() {
 
@@ -115,12 +113,10 @@ public class MoreFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(context, HistoryDetailsActivity.class);
-                intent.putExtra(HISTORY_FILES, (Serializable) playlistFiles);
+                intent.putExtra(HISTORY_FILES, playlistFiles);
                 context.startActivity(intent);
             }
         });
-
-
         return view;
     }
 
@@ -174,7 +170,7 @@ public class MoreFragment extends Fragment {
                             res.getString(7),
                             res.getString(8)
                     ), ""));
-                } else if (res.getString(1).equals("1")){
+                } else if (res.getString(1).equals("1")) {
                     temp.add(new PlaylistFiles(new VideoFiles(
                             res.getString(7),
                             res.getString(2),
@@ -192,4 +188,5 @@ public class MoreFragment extends Fragment {
         }
         return temp;
     }
+
 }

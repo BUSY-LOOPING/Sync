@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="65dp"
     android:background="@drawable/custom_ripple"
-    android:layout_marginTop="5dp">
+    android:paddingTop="2dp"
+    android:paddingBottom="2dp">
 
     <RelativeLayout
         android:id="@+id/img_rel"

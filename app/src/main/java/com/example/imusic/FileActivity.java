@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -24,7 +25,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public class FileActivity extends AppCompatActivity implements OnClickListenerActivityFileAdapter, SearchView.OnQueryTextListener {
@@ -35,6 +38,8 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
     public static final String STRING_FAV = "STRING_FAV";
     private DataBaseHelper mydb;
     private List<File> list = new ArrayList<>();
+    private ArrayList<Integer> pairList;
+    private Map<Integer, File> map = new HashMap<>();;
     private String sortOrder_name = "ASC";
     private String sortOrder_size = "ASC";
 
@@ -101,8 +106,10 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
                 }
                 break;
             case R.id.sort_by_name_file_menu:
+
                 Collections.sort(list, new MySortByName_FileActivity(sortOrder_name));
-                activityFileAdapter.update(list, recyclerView);
+                sort_no_media(list, pairList);
+                activityFileAdapter.update(list, pairList,recyclerView);
                 if (sortOrder_name.equals("ASC"))
                     sortOrder_name = "DES";
                 else
@@ -111,7 +118,8 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
 
             case R.id.sort_by_size_file_menu:
                 Collections.sort(list, new MySortBySize_FileActivity(sortOrder_size));
-                activityFileAdapter.update(list, recyclerView);
+                sort_no_media(list, pairList);
+                activityFileAdapter.update(list,pairList ,recyclerView);
                 if (sortOrder_size.equals("ASC"))
                     sortOrder_size = "DES";
                 else
@@ -136,14 +144,42 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
         return true;
     }
 
+    private void sort_no_media(List<File> key, ArrayList<Integer> tempList) {
+        for (int i = 0; i < tempList.size(); i++) {
+            if (tempList.get(i) == null){
+                Log.d("mylog", "null");
+            } else {
+                Log.d("mylog", "" + tempList.get(i));
+            }
+        }
+
+
+        Log.d("mylog", "after sort");
+        for (int i = 0; i < tempList.size(); i++) {
+            if (tempList.get(i) == null){
+                Log.d("mylog", "null");
+            } else {
+                Log.d("mylog", "" + tempList.get(i));
+            }
+        }
+
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_file);
         List<File> temp = (List<File>) getIntent().getSerializableExtra("parent");
-        parent = temp.get(0);
+        if (temp == null) {
+            Toast.makeText(this, "Cannot open the file location", Toast.LENGTH_SHORT).show();
+            finish();
+        } else
+            parent = temp.get(0);
+        if (!parent.exists()) {
+            Toast.makeText(this, "Cannot open the file location " + parent.getPath() + " .It no longer exists.", Toast.LENGTH_SHORT).show();
+        }
         mydb = new DataBaseHelper(this, "favourite.db", null, 1);
-        ArrayList<Integer> pairList = new ArrayList<>();
+        pairList = new ArrayList<>();
         File[] tempFiles = parent.listFiles();
         if (tempFiles != null) {
             list = Arrays.asList(tempFiles);
@@ -159,7 +195,7 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
 
 
         Toolbar toolbar = findViewById(R.id.toolbar_activity_file);
-        toolbar.setTitle(parent.getName().equals("sdcard") ? "Internal memory" : parent.getName());
+        toolbar.setTitle(parent.getName().equals("sdcard") | parent.getName().equals("0") ? "Internal memory" : parent.getName());
         TextView path_parent = findViewById(R.id.path_parent);
         String string = new StringBuilder().append((parent.getAbsolutePath().startsWith("/sdcard")) ? parent.getAbsolutePath().replace("/sdcard", "Internal memory") : parent.getAbsolutePath()).toString().replaceAll("/", "  <  ");
         if (string.startsWith("  <  storage  <  emulated  <  0")) {
@@ -181,7 +217,6 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(10);
-
         activityFileAdapter = new ActivityFileAdapter(this, list, pairList, this);
         activityFileAdapter.setHasStableIds(true);
         recyclerView.setAdapter(activityFileAdapter);
@@ -200,20 +235,21 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
 
     @Override
     public void onItemViewClick(int position, File file) {
+        if (!file.exists()) {
+            Toast.makeText(this, "Cannot open the file location " + parent.getPath() + " .It no longer exists.", Toast.LENGTH_SHORT).show();
+//            finish();
+        }
         if (file.isDirectory()) {
 //            if (!file.getName().equals("Android") || Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-                Intent intent = new Intent(this, FileActivity.class);
-                List<File> tempList = new ArrayList<>();
-                tempList.add(file);
-                intent.putExtra("parent", (Serializable) tempList);
-                try {
-                    startActivity(intent);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-//            }
-//        } else {
-//
+            Intent intent = new Intent(this, FileActivity.class);
+            List<File> tempList = new ArrayList<>();
+            tempList.add(file);
+            intent.putExtra("parent", (Serializable) tempList);
+            try {
+                startActivity(intent);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -231,12 +267,25 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
     public boolean onQueryTextChange(String newText) {
         String userInput = newText.toLowerCase();
         List<File> temp = new ArrayList<>();
+        ArrayList<Integer> tempPairList = new ArrayList<>();
+//        if (tempFiles != null) {
+//            list = Arrays.asList(tempFiles);
+//            for (int i = 0; i < list.size(); i++) {
+//                File[] array = list.get(i).listFiles();
+//                if (array != null) {
+//                    pairList.add(array.length);
+//                } else {
+//                    pairList.add(0);
+//                }
+//            }
+//        } else pairList.add(0);
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getName().toLowerCase().contains(userInput)) {
                 temp.add(list.get(i));
+                tempPairList.add(pairList.get(i));
             }
         }
-        activityFileAdapter.update(temp, recyclerView);
+        activityFileAdapter.update(temp, tempPairList, recyclerView);
         return true;
     }
 }

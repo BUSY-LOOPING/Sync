@@ -26,7 +26,7 @@ public class PlaylistsFragment extends Fragment implements SwipeRefreshLayout.On
     private SwipeRefreshLayout swipeRefreshLayout;
     private ArrayList<String> startingCharList;
     private PlaylistFragmentMainAdapter adapter;
-    private Handler handler = new Handler();
+    private final Handler handler = new Handler();
 
     public PlaylistsFragment() {
 
@@ -57,7 +57,6 @@ public class PlaylistsFragment extends Fragment implements SwipeRefreshLayout.On
         adapter = new PlaylistFragmentMainAdapter(getContext(), startingCharList, recyclerView);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(false);
-        adapter.setHasStableIds(true);
         recyclerView.setAdapter(adapter);
         swipeRefreshLayout = view.findViewById(R.id.swipe_container_fragment_playlist);
         swipeRefreshLayout.setOnRefreshListener(this);
@@ -97,10 +96,10 @@ public class PlaylistsFragment extends Fragment implements SwipeRefreshLayout.On
                 if (AddPlaylistFilesToDb.ready) {
                     ArrayList<String> temp = getCharacterList();
                     for (String s : temp) {
-                        if (!startingCharList.contains(s)) {
-                            startingCharList.add(s);
-                            adapter.add(s);
-                        }
+//                        if (!startingCharList.contains(s)) {
+//                            startingCharList.add(s);
+                        adapter.add(s);
+//                        }
                     }
                     adapter.refresh();
                     handler.removeCallbacks(this);

@@ -29,7 +29,7 @@ public class VideoFiles implements Serializable {
         this.resolution = resolution;
         String[] arr = new String[0];
         if (resolution != null)
-        arr = resolution.split("x");
+            arr = resolution.split("x");
         if (arr.length == 2) {
             if (Integer.parseInt(arr[1]) == 360)
                 resolutionInGeneral = "360p";

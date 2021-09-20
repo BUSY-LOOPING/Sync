@@ -1,20 +1,29 @@
 package com.example.imusic;
 
 import static com.example.imusic.fragment.MoreFragment.HISTORY_FILES;
+import static com.example.imusic.fragment.MoreFragment.historyAdapter;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.AttributeSet;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +35,8 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
     public static HistoryDetailsActivityAdapter historyDetailsActivityAdapter;
     private SwipeRefreshLayout swipeRefreshLayout;
     private SwipeRefreshLayout.OnRefreshListener refreshListener;
+    private DataBaseHelperHistory db;
+    private View view;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +45,13 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
         init();
         listeners();
         setRecyclerView();
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(@Nullable View parent, @NonNull String name, @NonNull Context context, @NonNull AttributeSet attrs) {
+        view = super.onCreateView(parent, name, context, attrs);
+        return view;
     }
 
     @Override
@@ -72,6 +90,20 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
                     }
                 });
                 break;
+            case R.id.clear_history_details_menu:
+                Snackbar.make(getWindow().getDecorView().findViewById(R.id.container_history_details), "Clear history?", Snackbar.LENGTH_LONG).setAction("OK", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        historyDetailsActivityAdapter.removeAll();
+                        historyAdapter.removeAll();
+                        boolean flag = HistoryDetailsActivity.this.deleteDatabase("history.db");
+                        if (flag)
+                            Toast.makeText(HistoryDetailsActivity.this, "Cleared history", Toast.LENGTH_SHORT).show();
+                        else
+                            Toast.makeText(HistoryDetailsActivity.this, "Something went wrong!", Toast.LENGTH_SHORT).show();
+                    }
+                }).show();
+                break;
         }
         return true;
     }
@@ -84,7 +116,12 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
     }
 
     private void setRecyclerView() {
-        historyDetailsActivityAdapter = new HistoryDetailsActivityAdapter(this, playlistFiles);
+        db = new DataBaseHelperHistory(HistoryDetailsActivity.this, "history.db", null, 1);
+        db.setAdapter(historyAdapter);
+        db.setAdapter(historyDetailsActivityAdapter);
+        historyDetailsActivityAdapter = new HistoryDetailsActivityAdapter(this, playlistFiles, db);
+//        historyDetailsActivityAdapter.setHasStableIds(true);
+        //sethasstableids will cause crash if we use notifyitemchanged
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemAnimator(new DefaultItemAnimator() {
             @Override
@@ -100,6 +137,7 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
         LinearLayoutManager llm = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, true);
         llm.setStackFromEnd(true);
         recyclerView.setLayoutManager(llm);
+        new ItemTouchHelper(simpleCallback).attachToRecyclerView(recyclerView);
         recyclerView.setAdapter(historyDetailsActivityAdapter);
     }
 
@@ -108,13 +146,15 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
         refreshListener = new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                recyclerView.smoothScrollToPosition(playlistFiles.size() - 1);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        swipeRefreshLayout.setRefreshing(false);
-                    }
-                }, 1500);
+                if (playlistFiles.size() > 0) {
+                    recyclerView.smoothScrollToPosition(playlistFiles.size() - 1);
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            swipeRefreshLayout.setRefreshing(false);
+                        }
+                    }, 1500);
+                }else swipeRefreshLayout.setRefreshing(false);
             }
         };
         swipeRefreshLayout.setOnRefreshListener(refreshListener);
@@ -136,6 +176,18 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        String userInput = newText.toLowerCase();
+        ArrayList<PlaylistFiles> temp = new ArrayList<>();
+        for (int i = 0; i < playlistFiles.size(); i++) {
+            if (playlistFiles.get(i).isMusicFile) {
+                if (playlistFiles.get(i).getMusicFiles().getTitle().toLowerCase().contains(userInput))
+                    temp.add(playlistFiles.get(i));
+            } else {
+                if (playlistFiles.get(i).getVideoFiles().getTitle().toLowerCase().contains(userInput))
+                    temp.add(playlistFiles.get(i));
+            }
+        }
+        historyDetailsActivityAdapter.update(temp , recyclerView);
         return true;
     }
 
@@ -149,4 +201,21 @@ public class HistoryDetailsActivity extends AppCompatActivity implements SearchV
             }
         }, 1500);
     }
+
+    ItemTouchHelper.SimpleCallback simpleCallback = new ItemTouchHelper.SimpleCallback(0 , ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            return false;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int pos = viewHolder.getAdapterPosition();
+            String id = playlistFiles.get(pos).isMusicFile ? playlistFiles.get(pos).getMusicFiles().getId() : playlistFiles.get(pos).getVideoFiles().getId();
+            playlistFiles.remove(pos);
+            historyDetailsActivityAdapter.notifyItemRemoved(pos);
+            historyAdapter.remove(id);
+            db.delete(id);
+        }
+    };
 }

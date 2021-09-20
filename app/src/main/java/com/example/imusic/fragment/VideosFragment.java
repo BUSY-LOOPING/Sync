@@ -74,7 +74,7 @@ public class VideosFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(10);
-        recyclerView.setItemAnimator(new DefaultItemAnimator(){
+        recyclerView.setItemAnimator(new DefaultItemAnimator() {
             @Override
             public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
                 return true;
@@ -166,7 +166,7 @@ public class VideosFragment extends Fragment implements SwipeRefreshLayout.OnRef
 
             @Override
             public boolean onMenuItemActionCollapse(MenuItem item) {
-                ((Activity)context).invalidateOptionsMenu();
+                ((Activity) context).invalidateOptionsMenu();
                 return true;
             }
         });

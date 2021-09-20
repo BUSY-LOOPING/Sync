@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.Objects;
 
 
 public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFragmentMainAdapter.PlaylistFragmentMainAdapterViewHolder> implements PlaylistCardListener {
@@ -32,7 +33,7 @@ public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFr
         this.mContext = mContext;
         this.startingCharList = startingCharList;
         arrPlaylistFiles = new ArrayList<>();
-        for (int i =0; i <startingCharList.size();i++) {
+        for (int i = 0; i < startingCharList.size(); i++) {
             arrPlaylistFiles.add(getPlaylistFiles(startingCharList.get(i)));
         }
         this.parentRecyclerView = parentRecyclerView;
@@ -48,7 +49,7 @@ public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFr
     @Override
     public void onBindViewHolder(@NonNull PlaylistFragmentMainAdapter.PlaylistFragmentMainAdapterViewHolder holder, int position) {
         holder.txt.setText(startingCharList.get(position));
-        setSameNameItemRecycler(mContext, holder.itemRecycler, position);
+        setSameNameItemRecycler(mContext, holder.itemRecycler, holder.getAdapterPosition());
     }
 
     @Override
@@ -56,15 +57,15 @@ public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFr
         return startingCharList.size();
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        return position;
-    }
+//    @Override
+//    public int getItemViewType(int position) {
+//        return position;
+//    }
 
-    @Override
-    public long getItemId(int position) {
-        return startingCharList.get(position).hashCode();
-    }
+//    @Override
+//    public long getItemId(int position) {
+//        return startingCharList.get(position).hashCode();
+//    }
 
     public static class PlaylistFragmentMainAdapterViewHolder extends RecyclerView.ViewHolder {
         private TextView txt;
@@ -78,13 +79,13 @@ public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFr
     }
 
     private void setSameNameItemRecycler(Context mContext, RecyclerView recyclerView, int pos) {
-        adapter = new SameNameItemRecyclerAdapter(mContext, return_sameNamePlaylistFiles(arrPlaylistFiles.get(pos)), this, recyclerView);
-        adapter.setHasStableIds(true);
-        LinearLayoutManager llm = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
-        recyclerView.setLayoutManager(llm);
-        recyclerView.setHasFixedSize(true);
-        recyclerView.setItemViewCacheSize(4);
-        recyclerView.setAdapter(adapter);
+            adapter = new SameNameItemRecyclerAdapter(mContext, return_sameNamePlaylistFiles(arrPlaylistFiles.get(pos)), this, recyclerView);
+            adapter.setHasStableIds(false);
+            LinearLayoutManager llm = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
+            recyclerView.setLayoutManager(llm);
+            recyclerView.setHasFixedSize(true);
+            recyclerView.setItemViewCacheSize(4);
+            recyclerView.setAdapter(adapter);
     }
 
     private ArrayList<SameNamePlaylistFiles> return_sameNamePlaylistFiles(ArrayList<PlaylistFiles> playlistFiles) {
@@ -151,21 +152,26 @@ public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFr
             }
             res.close();
         }
-        db.close();
+//        db.close();
         return temp;
     }
 
     public void add(String character) {
         if (!startingCharList.contains(character)) {
             startingCharList.add(character);
+            int index = startingCharList.size() - 1;
+            arrPlaylistFiles.add(getPlaylistFiles(startingCharList.get(index)));
+            notifyItemInserted(startingCharList.size());
         }
-        notifyItemInserted(startingCharList.size() - 1);
+//        notifyDataSetChanged();
     }
 
     public void refresh() {
-        for (int i = 0; i < parentRecyclerView.getAdapter().getItemCount(); i++) {
-            if ((parentRecyclerView.findViewHolderForAdapterPosition(i)) != null)
-                ((SameNameItemRecyclerAdapter) (((PlaylistFragmentMainAdapterViewHolder) parentRecyclerView.findViewHolderForAdapterPosition(i)).itemRecycler.getAdapter())).refresh();
+        if (parentRecyclerView.getAdapter() != null) {
+            for (int i = 0; i < parentRecyclerView.getAdapter().getItemCount(); i++) {
+                if ((parentRecyclerView.findViewHolderForAdapterPosition(i)) != null)
+                    ((SameNameItemRecyclerAdapter) (((PlaylistFragmentMainAdapterViewHolder) Objects.requireNonNull(parentRecyclerView.findViewHolderForAdapterPosition(i))).itemRecycler.getAdapter())).refresh();
+            }
         }
     }
 

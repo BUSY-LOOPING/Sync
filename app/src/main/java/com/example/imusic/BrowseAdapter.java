@@ -2,6 +2,7 @@ package com.example.imusic;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,6 +27,7 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyBrowseVi
     View view;
     private DataBaseHelper mydb;
     private RecyclerView recyclerView;
+    private String rootPath;
 
     public BrowseAdapter() {
     }
@@ -34,6 +36,7 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyBrowseVi
         this.mContext = mContext;
         this.favorites = favorites;
         this.recyclerView = recyclerView;
+        rootPath = Environment.getExternalStorageDirectory().getPath();
     }
 
     @NonNull
@@ -58,7 +61,7 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyBrowseVi
                 mContext.startActivity(intent);
             }
         });
-        if (favorites.get(position).getName().equals("sdcard")) {
+        if (favorites.get(position).getPath().equals(rootPath)) {
             holder.folder_name.setText("Internal memory");
         } else
             holder.folder_name.setText(favorites.get(position).getName());
@@ -80,7 +83,7 @@ public class BrowseAdapter extends RecyclerView.Adapter<BrowseAdapter.MyBrowseVi
                 bottomSheetDialog.show();
 
                 TextView txt = bottomSheetView.findViewById(R.id.folder_name_bottom_sheet);
-                txt.setText(favorites.get(position).getName());
+                txt.setText(favorites.get(position).getPath().equals(rootPath) ? "Internal memory" : favorites.get(position).getName());
                 bottomSheetView.findViewById(R.id.option1).setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {

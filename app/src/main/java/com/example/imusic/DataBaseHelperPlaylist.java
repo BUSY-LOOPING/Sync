@@ -19,19 +19,18 @@ public class DataBaseHelperPlaylist extends SQLiteOpenHelper {
     private int version;
 
 
-
     public DataBaseHelperPlaylist(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         this.context = context;
         this.name = name;
         this.factory = factory;
         this.version = version;
-        check();
+//        check();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        db.execSQL("CREATE TABLE " + TABLE_NAME + " (Sno Integer PRIMARY KEY AUTOINCREMENT, isAudio BOOL, isVideo BOOL, path TEXT, title TEXT, artist TEXT, album TEXT, duration TEXT, id TEXT, size TEXT, filename TEXT, dateAdded TEXT, resolution TEXT, playlistName TEXT)");
+        db.execSQL("CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " (Sno Integer PRIMARY KEY AUTOINCREMENT, isAudio BOOL, isVideo BOOL, path TEXT, title TEXT, artist TEXT, album TEXT, duration TEXT, id TEXT, size TEXT, filename TEXT, dateAdded TEXT, resolution TEXT, playlistName TEXT)");
     }
 
     @Override

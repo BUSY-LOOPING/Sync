@@ -52,26 +52,25 @@ import java.util.List;
 
 public class MiniPlayer implements ServiceConnection {
 
-    private BottomSheetBehavior bottomSheetBehavior;
-    public ToggleButton tb_img;
-    private Context context;
-    private View view;
-    private BottomNavigationView bottomNavigationView;
-    public String playingFrom = "";
-    private ScrollView scrollView;
-    private LinearLayoutCompat linearLayoutCompat;
-
-    private MusicService musicService;
-    public ContentLoadingProgressBar bar;
-    public TextView time, song_name, artist;
-    public RecyclerView recyclerView;
-    private LinearLayoutManager llm;
-    private MiniPlayerRecyclerViewAdapter adapter;
-
-    public boolean reachedTop = false;
     public static boolean flag = false;
     public static int peekHeight = 0;
     public final Handler handler = new Handler();
+    public ToggleButton tb_img;
+    public String playingFrom = "";
+    public ContentLoadingProgressBar bar;
+    public TextView time, song_name, artist;
+    public RecyclerView recyclerView;
+    public boolean reachedTop = false;
+    public ImageView miniPlayPause, album_art, bg, bottomPlayPause, nextBtn, prevBtn, repeatBtn, centerAlbumArt, searchBtn, moreBtn;
+    public SeekBar seekBar;
+    public boolean isShown = false;
+    private BottomSheetBehavior bottomSheetBehavior;
+    private Context context;
+    private View view;
+    private BottomNavigationView bottomNavigationView;
+    private ScrollView scrollView;
+    private LinearLayoutCompat linearLayoutCompat;
+    private MusicService musicService;
     public Runnable runnable = new Runnable() {
         @Override
         public void run() {
@@ -112,11 +111,10 @@ public class MiniPlayer implements ServiceConnection {
             }
         }
     };
-    public ImageView miniPlayPause, album_art, bg, bottomPlayPause, nextBtn, prevBtn, repeatBtn, centerAlbumArt, searchBtn, moreBtn;
-    public SeekBar seekBar;
+    private LinearLayoutManager llm;
+    private MiniPlayerRecyclerViewAdapter adapter;
     private AnimatedVectorDrawableCompat avd;
     private AnimatedVectorDrawable avd2;
-    public boolean isShown = false;
 
 
     public MiniPlayer() {
@@ -133,6 +131,9 @@ public class MiniPlayer implements ServiceConnection {
 //        showPlayer();
     }
 
+    public static void setFlag(boolean flag) {
+        MiniPlayer.flag = flag;
+    }
 
     private void setRecyclerView() {
 //        if (listSongs == null || listSongs.size() == 0)
@@ -170,11 +171,6 @@ public class MiniPlayer implements ServiceConnection {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
-    }
-
-
-    public static void setFlag(boolean flag) {
-        MiniPlayer.flag = flag;
     }
 
     private void init() {
@@ -459,7 +455,7 @@ public class MiniPlayer implements ServiceConnection {
      */
     public int progressToTimer(int progress, int totalDuration) {
         int currentDuration = 0;
-        totalDuration = (int) (totalDuration / 1000);
+        totalDuration = totalDuration / 1000;
         currentDuration = (int) ((((double) progress) / 100) * totalDuration);
 
         // return current duration in milliseconds

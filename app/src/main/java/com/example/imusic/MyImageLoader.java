@@ -24,7 +24,7 @@ public class MyImageLoader {
         private Bitmap bitmap = null;
         private LruCache<Long, Bitmap> mBitmapCache;
         private BitmapDrawable mPlaceholder;
-        private Context mContext;
+        private final Context mContext;
         private Long id;
         private ImageView icon;
         private Size size;
@@ -66,6 +66,10 @@ public class MyImageLoader {
 
         public void setSize(Size size) {
             this.size = size;
+        }
+
+        public void setmPlaceholder(Drawable drawable) {
+            this.mPlaceholder = ((BitmapDrawable)drawable);
         }
 
         private void loadAlbumArt(ImageView icon, Long id) {

@@ -1,8 +1,11 @@
 package com.example.imusic;
 
+import android.annotation.SuppressLint;
+import android.content.ContentResolver;
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,15 +26,13 @@ public class ActivityFileAdapter extends RecyclerView.Adapter<ActivityFileAdapte
     private Context mContext;
     private List<File> list;
     private OnClickListenerActivityFileAdapter mListener;
-    long start;
-    String[] temp;
-    ArrayList<Integer> tempList;
+    private ArrayList<Integer> tempList;
 
     ActivityFileAdapter() {
 
     }
 
-    ActivityFileAdapter(Context mContext, List<File> list, ArrayList<Integer> tempList , OnClickListenerActivityFileAdapter mListener) {
+    ActivityFileAdapter(Context mContext, List<File> list, ArrayList<Integer> tempList, OnClickListenerActivityFileAdapter mListener) {
         this.mContext = mContext;
         this.list = list;
         this.mListener = mListener;
@@ -55,28 +56,15 @@ public class ActivityFileAdapter extends RecyclerView.Adapter<ActivityFileAdapte
         return new MyActivityFileViewHolder(view, mListener);
     }
 
+    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void onBindViewHolder(@NonNull ActivityFileAdapter.MyActivityFileViewHolder holder, int position) {
-        start = System.currentTimeMillis();
-//        temp = list.get(position).list();
-//        holder.folder_file_name.setText(list.get(position).getName());
-//        if (list.get(position).isDirectory()) {
-//            if (temp != null) {
-//                if (temp.length == 0)
-//                    holder.no_items.setText("Empty");
-//                else
-//                    holder.no_items.setText(String.valueOf(temp.length));
-//            }
-//        } else {
-//            holder.no_items.setVisibility(View.GONE);
-//        }
-
         holder.folder_file_name.setText(list.get(position).getName());
         if (list.get(position).isDirectory()) {
-                if (tempList.get(position) == 0)
-                    holder.no_items.setText("Empty");
-                else
-                    holder.no_items.setText(String.valueOf(tempList.get(position)));
+            if (tempList.get(position) == 0)
+                holder.no_items.setText("Empty");
+            else
+                holder.no_items.setText(String.valueOf(tempList.get(position)));
         } else {
             holder.no_items.setVisibility(View.GONE);
         }
@@ -88,8 +76,15 @@ public class ActivityFileAdapter extends RecyclerView.Adapter<ActivityFileAdapte
                     .error(R.drawable.music_icon)
                     .into(holder.folder_img);
         }
+        if (isMusicFile(list.get(position).getAbsolutePath())) {
+            MyImageLoader.from myImageLoader = new MyImageLoader.from(mContext);
+            long id = getSongIdFromMediaStore(list.get(position).getPath());
+            myImageLoader.load(id);
+            myImageLoader.into(holder.folder_img);
+//            Drawable drawable = new BitmapDrawable(mContext.getResources(), BitmapFactory.decodeResource(mContext.getResources(), R.drawable.ic_baseline_music_note_24));
+//            myImageLoader.setmPlaceholder(drawable);
+        }
 
-        Log.d("myfile", "time = " + (System.currentTimeMillis() - start));
     }
 
     private boolean isVideoFile(String path) {
@@ -99,7 +94,29 @@ public class ActivityFileAdapter extends RecyclerView.Adapter<ActivityFileAdapte
 
     private boolean isMusicFile(String path) {
         String mimeType = URLConnection.guessContentTypeFromName(path);
-        return mimeType != null && mimeType.startsWith("music");
+        return mimeType != null && mimeType.startsWith("audio");
+    }
+
+    public long getSongIdFromMediaStore(String songPath) {
+        long id = 0;
+        ContentResolver cr = mContext.getContentResolver();
+
+        Uri uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+        String selection = MediaStore.Audio.Media.DATA;
+        String[] selectionArgs = {songPath};
+        String[] projection = {MediaStore.Audio.Media._ID};
+        String sortOrder = MediaStore.Audio.Media.TITLE + " ASC";
+
+        Cursor cursor = cr.query(uri, projection, selection + "=?", selectionArgs, sortOrder);
+
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                int idIndex = cursor.getColumnIndex(MediaStore.Audio.Media._ID);
+                id = Long.parseLong(cursor.getString(idIndex));
+            }
+            cursor.close();
+        }
+        return id;
     }
 
     @Override
@@ -134,10 +151,11 @@ public class ActivityFileAdapter extends RecyclerView.Adapter<ActivityFileAdapte
         }
     }
 
-    public void update(List<File> list, RecyclerView recyclerView) {
+    public void update(List<File> list, ArrayList<Integer> tempList, RecyclerView recyclerView) {
 //        this.list = new ArrayList<>();
 //        this.list.addAll(list);
         this.list = list;
+        this.tempList = tempList;
         notifyDataSetChanged();
         recyclerView.scheduleLayoutAnimation();
     }

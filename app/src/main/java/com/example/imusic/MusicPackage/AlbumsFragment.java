@@ -20,13 +20,12 @@ import java.util.ArrayList;
 
 public class AlbumsFragment extends Fragment {
 
-    public AlbumsFragment() {
-
-    }
-
     RecyclerView recyclerView;
     AlbumAdapter albumAdapter;
     ArrayList<MusicFiles> albums = new ArrayList<>();
+    public AlbumsFragment() {
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

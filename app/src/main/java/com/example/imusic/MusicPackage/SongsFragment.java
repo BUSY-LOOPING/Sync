@@ -55,10 +55,10 @@ import java.util.List;
 public class SongsFragment extends Fragment implements OnItemClickListenerMusicAdapter, SwipeRefreshLayout.OnRefreshListener, SearchView.OnQueryTextListener {
 
     public static MusicAdapter musicAdapter;
-    private Context context;
-    private SwipeRefreshLayout swipeRefreshLayout;
     private final String MY_SORT_PREF = "SortOrder";
     DeleteMusicFile deleteMusicFile;
+    private Context context;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
     public SongsFragment() {
     }
@@ -79,7 +79,6 @@ public class SongsFragment extends Fragment implements OnItemClickListenerMusicA
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("mytag", "inside OncreateView SongsFragment");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_songs, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);

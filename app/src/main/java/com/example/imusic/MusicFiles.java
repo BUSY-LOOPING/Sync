@@ -17,6 +17,18 @@ public class MusicFiles implements Serializable {
     public MusicFiles() {
     }
 
+    public MusicFiles(String path, String title, String artist, String album, String duration, String id, String size) {
+        this.path = path;
+        this.title = title;
+        this.artist = artist;
+        this.album = album;
+        this.duration = duration;
+        this.id = id;
+        this.size = size;
+        if (this.artist == null || this.artist.equals("unknown")) this.artist = "<unknown>";
+        if (this.album == null || this.album.equals("unknown")) this.album = "<unknown>";
+    }
+
     public String getSize() {
         return size;
     }
@@ -65,25 +77,12 @@ public class MusicFiles implements Serializable {
         this.duration = duration;
     }
 
-    public String getId () {
+    public String getId() {
         return id;
     }
 
-    public void setId (String id) {
+    public void setId(String id) {
         this.id = id;
-    }
-
-
-    public MusicFiles(String path, String title, String artist, String album, String duration, String id, String size) {
-        this.path = path;
-        this.title = title;
-        this.artist = artist;
-        this.album = album;
-        this.duration = duration;
-        this.id = id;
-        this.size = size;
-        if (this.artist == null || this.artist.equals("unknown"))  this.artist = "<unknown>";
-        if (this.album == null || this.album.equals("unknown")) this.album = "<unknown>";
     }
 
     @Override

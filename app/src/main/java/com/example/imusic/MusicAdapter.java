@@ -274,12 +274,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
         intent.putExtra(Intent.EXTRA_SUBJECT, "Here are some files.");
 //        intent.putExtra(Intent.EXTRA_TITLE, positions.size() > 1 ? mFiles.get(positions.get(0)).getTitle() + " + " + positions.size() + " more" : mFiles.get(positions.get(0)).getTitle());
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
-        intent.setType("*/*");
+        intent.setType("audio/*");
 //        String[] mimetypes = new String[positions.size()];
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //            intent.putExtra(Intent.EXTRA_MIME_TYPES, );
 //        }
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_GRANT_READ_URI_PERMISSION);
 
         ArrayList<Uri> files = new ArrayList<Uri>();
 
@@ -293,6 +293,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
         StrictMode.setVmPolicy(builder.build());
         intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, files);
         mContext.startActivity(intent);
+//        mContext.startActivity(Intent.createChooser(intent, "Share files to..."));
     }
 
     private void infoBtnClicked(int position) {
@@ -342,6 +343,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
 //        return position;
 //    }
 
+
     private void loadAlbumArt(ImageView icon, Long id) {
         if (cancelLoadTask(icon, id)) {
             LoadAlbumArt loadAlbumArt = new LoadAlbumArt(icon, mContext);
@@ -364,7 +366,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
         return false;
     }
 
-    public AsyncTask getLoadTask(ImageView icon) {
+    private AsyncTask getLoadTask(ImageView icon) {
         LoadAlbumArt task = null;
         Drawable drawable = icon.getDrawable();
         if (drawable instanceof AsyncDrawable) {
@@ -392,11 +394,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     bmp = mContext.getContentResolver().loadThumbnail(
                             artworkUri,
-                            new Size(120, 120),
+                            new Size(110, 110),
                             null);
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+//                e.printStackTrace();
             }
             return bmp;
         }
@@ -433,7 +435,6 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
             return loadAlbumArtWeakReference.get();
         }
     }
-
 
     private void setAnimation(View viewToAnimate, int position) {
         // If the bound view wasn't previously displayed on screen, it's animated
