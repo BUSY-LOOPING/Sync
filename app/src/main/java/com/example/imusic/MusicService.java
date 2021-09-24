@@ -67,6 +67,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     public static final String MUSIC_CURRENT_DURATION = "MUSIC_CURRENT_DURATION";
     public static boolean playing = false;
     public static boolean initiated = false;
+    public static boolean flag = false;
 
     private MusicFiles nowPlayingFile;
 
@@ -200,6 +201,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     void createMediaPlayer(int positionInner) {
+//        if (flag) {
+            musicFiles = listSongs;
+            flag = false;
+//        }
         MiniPlayer.setFlag(false);
         SharedPreferences preferences = getSharedPreferences(MUSIC_NOW_PLAYING, MODE_PRIVATE);
         try {
@@ -257,7 +262,7 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
             e.printStackTrace();
             mediaPlayer = null;
             LocalBroadcastManager localBroadcastManager = LocalBroadcastManager
-                    .getInstance(this);
+                    .getInstance(getApplicationContext());
             localBroadcastManager.sendBroadcast(new Intent("com.playerAct.action.close"));
         }
     }
@@ -537,6 +542,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 //        } else {
 //            this.position++;
 //        }
+    }
+
+    public void update(ArrayList<MusicFiles> newlist, int position) {
+        musicFiles = newlist;
+        this.position = position;
     }
 
 

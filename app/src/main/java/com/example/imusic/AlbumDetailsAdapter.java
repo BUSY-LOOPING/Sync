@@ -28,8 +28,6 @@ public class AlbumDetailsAdapter extends RecyclerView.Adapter<AlbumDetailsAdapte
     public AlbumDetailsAdapter(Context mContext, ArrayList<MusicFiles> albumFiles) {
         this.mContext = mContext;
         AlbumDetailsAdapter.albumFiles = albumFiles;
-        for (int i = 0; i < albumFiles.size(); i++)
-            Log.d("albums", albumFiles.get(i).getTitle());
     }
 
     @NonNull
@@ -63,15 +61,9 @@ public class AlbumDetailsAdapter extends RecyclerView.Adapter<AlbumDetailsAdapte
         }
         holder.album_name.setText(albumFiles.get(position).getTitle());
         holder.artist_album.setText(new StringBuilder().append(albumFiles.get(position).getArtist()).append("  .  ").append(albumFiles.get(position).getAlbum()).toString());
-        byte[] image = getAlbumArt(albumFiles.get(position).getPath());
-        if (image != null) {
-            Glide.with(mContext)
-                    .load(image)
-                    .into(holder.album_img);
-        } else {
-            Glide.with(mContext).clear(holder.album_img);
-            holder.album_img.setImageResource(R.drawable.music_icon);
-        }
+        MyImageLoader.from loader = new MyImageLoader.from(mContext);
+        loader.load(Long.parseLong(albumFiles.get(position).getId()));
+        loader.into(holder.album_img);
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

@@ -2,10 +2,8 @@ package com.example.imusic;
 
 import static com.example.imusic.MusicService.MUSIC_NOW_PLAYING;
 import static com.example.imusic.MusicService.NOW_PLAYING;
-import static com.example.imusic.MusicService.PLAYING_FROM;
 import static com.example.imusic.MusicService.initiated;
 import static com.example.imusic.MusicService.playing;
-import static com.example.imusic.PlayerActivity.listSongs;
 
 import android.Manifest;
 import android.app.NotificationManager;
@@ -26,7 +24,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -73,12 +70,11 @@ public class MainActivity extends AppCompatActivity {
     private Thread.UncaughtExceptionHandler _unCaughtExceptionHandler = new Thread.UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
-            ex.printStackTrace();
+            Log.e("", ex.toString());
             // TODO handle exception here
             SharedPreferences.Editor editor = getSharedPreferences(MUSIC_NOW_PLAYING, MODE_PRIVATE).edit();
             editor.putString(NOW_PLAYING, "false");
             editor.apply();
-            Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
         }
     };
 
@@ -102,6 +98,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void appInitialization() {
+        new CheckDb(this).start();
         defaultUEH = Thread.getDefaultUncaughtExceptionHandler();
         Thread.setDefaultUncaughtExceptionHandler(_unCaughtExceptionHandler);
     }

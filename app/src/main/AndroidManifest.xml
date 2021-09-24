@@ -78,9 +78,15 @@
             </intent-filter>
         </activity>
         <activity
+            android:hardwareAccelerated="false"
             android:name=".VideoPlayerActivity"
-            android:configChanges="orientation|screenSize|layoutDirection"
-            android:screenOrientation="fullSensor" />
+            android:configChanges="orientation|screenSize|smallestScreenSize|layoutDirection|screenLayout"
+            android:screenOrientation="fullSensor"
+            android:supportsPictureInPicture="true"
+            android:resizeableActivity="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
+            tools:targetApi="n" />
 
         <service
             android:name=".MusicService"

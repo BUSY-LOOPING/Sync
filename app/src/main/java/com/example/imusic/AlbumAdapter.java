@@ -21,6 +21,7 @@ public class AlbumAdapter extends RecyclerView.Adapter<AlbumAdapter.AlbumAdapter
         this.albumFiles = albumFiles;
     }
 
+
     @NonNull
     @Override
     public AlbumAdapterViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

@@ -34,6 +34,7 @@ public class SameNameItemRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
 //    private ArrayList<Integer> number_media;
     private ArrayList<SameNamePlaylistFiles> sameNamePlaylistFiles;
     private final RecyclerView recyclerView;
+    private final PlaylistFragmentMainAdapter mainAdapter;
     private final int FIRST_HOLDER = 0;
     private final int SECOND_HOLDER = 1;
     boolean flag = false;
@@ -41,11 +42,12 @@ public class SameNameItemRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
     PlaylistCardListener listener;
 
 
-    SameNameItemRecyclerAdapter(Context mContext, ArrayList<SameNamePlaylistFiles> sameNamePlaylistFiles, PlaylistCardListener listener, RecyclerView recyclerView) {
+    SameNameItemRecyclerAdapter(Context mContext, ArrayList<SameNamePlaylistFiles> sameNamePlaylistFiles, PlaylistCardListener listener, RecyclerView recyclerView, PlaylistFragmentMainAdapter mainAdapter) {
         this.mContext = mContext;
         this.listener = listener;
         this.sameNamePlaylistFiles = sameNamePlaylistFiles;
         this.recyclerView = recyclerView;
+        this.mainAdapter = mainAdapter;
     }
 
     private ArrayList<SameNamePlaylistFiles> return_sameNamePlaylistFiles(ArrayList<PlaylistFiles> playlistFiles) {
@@ -276,7 +278,7 @@ public class SameNameItemRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
                 listener.itemClick(sameNamePlaylistFiles.get(getAdapterPosition()));
             }
             if (v.getId() == more.getId()) {
-                listener.moreClick();
+                listener.moreClick(sameNamePlaylistFiles.get(getAdapterPosition()), SameNameItemRecyclerAdapter.this);
             }
             if (v.getId() == fab.getId()) {
                 listener.fabClick();
@@ -323,7 +325,7 @@ public class SameNameItemRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
                 listener.itemClick(sameNamePlaylistFiles.get(getAdapterPosition()));
             }
             if (v.getId() == more.getId()) {
-                listener.moreClick();
+                listener.moreClick(sameNamePlaylistFiles.get(getAdapterPosition()), SameNameItemRecyclerAdapter.this);
             }
             if (v.getId() == fab.getId()) {
                 listener.fabClick();
@@ -404,5 +406,22 @@ public class SameNameItemRecyclerAdapter extends RecyclerView.Adapter<RecyclerVi
         }
         db.close();
         return temp;
+    }
+
+    public void delete(String playlistName) {
+        for (int i = 0; i < sameNamePlaylistFiles.size(); i++) {
+            if (sameNamePlaylistFiles.get(i).getPlayListName().equals(playlistName)) {
+                String startingChar = sameNamePlaylistFiles.get(i).getPlayListName().substring(0 , 1);
+                sameNamePlaylistFiles.remove(sameNamePlaylistFiles.get(i));
+                notifyItemRemoved(i);
+                DataBaseHelperPlaylist db = new DataBaseHelperPlaylist(mContext, PLAYLIST_NAME, null, 1);
+                db.deleteForPlaylistName(playlistName);
+                db.close();
+                if (sameNamePlaylistFiles.size() == 0) {
+                    mainAdapter.delete(startingChar);
+                }
+                break;
+            }
+        }
     }
 }

@@ -80,7 +80,7 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
     private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if(intent.getAction().equals("com.playerAct.action.close")){
+            if (intent.getAction().equals("com.playerAct.action.close")) {
                 end();
             }
         }
@@ -529,7 +529,8 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
 //                }
 //            }
             playPauseBtn.setBackgroundResource(R.drawable.ic_play);
-            musicService.showNotification(R.drawable.ic_pause);
+            if (!flag)
+                musicService.showNotification(R.drawable.ic_pause);
         }
         audioSessionId = musicService.getAudioSessionId();
         if (audioSessionId != -1) {
@@ -613,10 +614,11 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
 
     private void getIntentMethod() {
         Intent intent = getIntent();
+        String sender = "";
         if (intent != null) {
             position = intent.getIntExtra("position", -1);
             SharedPreferences.Editor editor = getSharedPreferences(MUSIC_NOW_PLAYING, MODE_PRIVATE).edit();
-            String sender = intent.getStringExtra("sender");
+            sender = intent.getStringExtra("sender");
             if (sender != null) {
                 if (sender.equals("albumDetails")) {
                     listSongs = albumFiles;
@@ -625,6 +627,7 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
                 }
                 if (sender.equals("historyAdapter")) {
                     listSongs = (ArrayList<MusicFiles>) intent.getSerializableExtra("listSongs");
+                    MusicService.flag = true;
                 }
                 if (sender.equals("mainActivity")) {
                     listSongs = mFiles;
@@ -658,10 +661,11 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
                 seekBar.setProgress(musicService.getCurrentPosition() / 1000);
                 playPauseBtn.setImageResource(R.drawable.ic_play);
             }
+
         } else {
+
             if (listSongs != null) {
                 playPauseBtn.setImageResource(R.drawable.ic_pause);
-                Log.d("mysize", "pos = " + position);
                 uri = Uri.parse(listSongs.get(position).getPath());
             }
 
@@ -875,7 +879,7 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
         super.onBackPressed();
     }
 
-    public void end(){
+    public void end() {
         Toast.makeText(this, "The file cannot be played.", Toast.LENGTH_SHORT).show();
         finish();
     }

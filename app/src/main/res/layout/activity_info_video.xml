@@ -24,7 +24,7 @@
                 android:scrollbars="none">
 
                 <TextView
-                    android:id="@+id/path_activity_info"
+                    android:id="@+id/path_activity_info_video"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/helvetica"
@@ -65,7 +65,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/length_info_activity"
+                        android:id="@+id/length_info_activity_video"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
@@ -109,7 +109,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/size_info_activity"
+                        android:id="@+id/size_info_activity_video"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="20dp"
@@ -126,22 +126,73 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="20dp"
+                android:layout_marginTop="150dp"
                 android:orientation="vertical">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="180dp"
+                    android:text="Video Track"
+                    android:textColor="@color/infoActDarkGrey"
+                    android:textSize="19sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/codec_video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Codec : MPEG Audio layer 1/2"
+                        android:textColor="@color/infoActLightGrey"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/resolution_info_activity_video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Resolution : "
+                        android:textColor="@color/infoActLightGrey"
+                        android:textSize="15sp" />
+
+                    <TextView
+                        android:id="@+id/frame_rate_video"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Frame Rate : 44 Hz"
+                        android:textColor="@color/infoActLightGrey"
+                        android:textSize="15sp" />
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="50dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     android:text="Audio Track"
                     android:textColor="@color/infoActDarkGrey"
                     android:textSize="19sp"
                     android:textStyle="bold" />
 
                 <LinearLayout
-                    android:layout_marginTop="5dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="10dp"
+                    android:layout_marginTop="5dp"
                     android:orientation="vertical">
 
                     <TextView
@@ -181,67 +232,12 @@
 
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="20dp"
-                android:layout_marginTop="20dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Video Track"
-                    android:textColor="@color/infoActDarkGrey"
-                    android:textSize="19sp"
-                    android:textStyle="bold" />
-
-                <LinearLayout
-                    android:layout_marginTop="5dp"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="10dp"
-                    android:orientation="vertical">
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Bitrate : 320 KB/s"
-                        android:textColor="@color/infoActLightGrey"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Codec : MPEG Audio layer 1/2"
-                        android:textColor="@color/infoActLightGrey"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="2 channels"
-                        android:textColor="@color/infoActLightGrey"
-                        android:textSize="15sp" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Sample Rate : 44100 Hz"
-                        android:textColor="@color/infoActLightGrey"
-                        android:textSize="15sp" />
-
-                </LinearLayout>
-
-
-            </LinearLayout>
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout_activity_details"
+        android:id="@+id/appBarLayout_activity_details_video"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:fitsSystemWindows="true"
@@ -255,20 +251,19 @@
             app:layout_scrollFlags="scroll|exitUntilCollapsed|snap">
 
             <ImageView
-                android:id="@+id/album_image_activity_details"
+                android:id="@+id/album_image_activity_details_video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                app:srcCompat="@drawable/music_icon" />
+                android:scaleType="centerCrop" />
 
             <ImageView
-                android:id="@+id/gradient_activity_details"
+                android:id="@+id/gradient_activity_details_video"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:srcCompat="@drawable/gradient_bg" />
 
             <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar_activity_info"
+                android:id="@+id/toolbar_activity_info_video"
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 app:layout_collapseMode="pin"
@@ -289,6 +284,7 @@
         app:backgroundTint="@color/white"
         app:borderWidth="0dp"
         app:maxImageSize="30dp"
+        app:tint="#404040"
         app:srcCompat="@drawable/ic_play" />
 
 

@@ -15,6 +15,8 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.imusic.fragment.PlaylistsFragment;
+
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -22,6 +24,7 @@ import java.util.Objects;
 public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFragmentMainAdapter.PlaylistFragmentMainAdapterViewHolder> implements PlaylistCardListener {
     private ArrayList<String> startingCharList;
     private Context mContext;
+    private PlaylistsFragment fragment;
     public SameNameItemRecyclerAdapter adapter;
     private RecyclerView parentRecyclerView;
     private ArrayList<ArrayList<PlaylistFiles>> arrPlaylistFiles;
@@ -79,7 +82,7 @@ public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFr
     }
 
     private void setSameNameItemRecycler(Context mContext, RecyclerView recyclerView, int pos) {
-            adapter = new SameNameItemRecyclerAdapter(mContext, return_sameNamePlaylistFiles(arrPlaylistFiles.get(pos)), this, recyclerView);
+            adapter = new SameNameItemRecyclerAdapter(mContext, return_sameNamePlaylistFiles(arrPlaylistFiles.get(pos)), this, recyclerView, PlaylistFragmentMainAdapter.this);
             adapter.setHasStableIds(false);
             LinearLayoutManager llm = new LinearLayoutManager(mContext, LinearLayoutManager.HORIZONTAL, false);
             recyclerView.setLayoutManager(llm);
@@ -188,13 +191,26 @@ public class PlaylistFragmentMainAdapter extends RecyclerView.Adapter<PlaylistFr
     }
 
     @Override
-    public void moreClick() {
-        Toast.makeText(mContext, "more clicked", Toast.LENGTH_SHORT).show();
+    public void moreClick(SameNamePlaylistFiles playlistFile, SameNameItemRecyclerAdapter adapter) {
+        PlaylistCardBottomSheet bottomSheet = new PlaylistCardBottomSheet();
+        bottomSheet.setPlaylistFile(playlistFile);
+        bottomSheet.setAdapter(adapter);
+        bottomSheet.setShowsDialog(true);
+        bottomSheet.show(((MainActivity)mContext).getSupportFragmentManager(),bottomSheet.getTag());
     }
 
     @Override
     public void longPress() {
         Toast.makeText(mContext, "long clicked", Toast.LENGTH_SHORT).show();
+    }
+
+    public void delete(String startingChar) {
+        for (int i =0 ; i < startingCharList.size(); i ++) {
+            if (startingCharList.get(i).equals(startingChar)) {
+                startingCharList.remove(startingCharList.get(i));
+                notifyItemRemoved(i);
+            }
+        }
     }
 
 }

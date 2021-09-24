@@ -224,6 +224,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
                                 case R.id.play_contextual_menu_music_adapter:
                                     break;
                                 case R.id.add_to_playlist_contextual_menu_musicAdapter:
+                                    AddToPlaylistPopup addToPlaylistPopup = new AddToPlaylistPopup();
+                                    addToPlaylistPopup.setShowsDialog(true);
+                                    addToPlaylistPopup.show(((MainActivity)mContext).getSupportFragmentManager(), addToPlaylistPopup.getTag());
+                                    addToPlaylistPopup.addMusicFiles(selectedList);
                                     break;
                                 case R.id.delete_contextual_menu_musicAdapter:
                                     break;

@@ -8,9 +8,11 @@ import static com.example.imusic.fragment.MoreFragment.historyAdapter;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.PictureInPictureParams;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Point;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
@@ -19,11 +21,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.provider.Settings;
+import android.transition.Fade;
+import android.transition.Transition;
+import android.transition.TransitionManager;
+import android.util.Rational;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -61,6 +68,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         LOCK, FULLCONTROLS
     }
 
+    private PictureInPictureParams.Builder pictureInPictureParams;
     private ControlsMode controlsState = ControlsMode.FULLCONTROLS;
     private AnimatedVectorDrawableCompat avd;
     private AnimatedVectorDrawable avd2;
@@ -71,19 +79,32 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             hideAllControls();
         }
     };
+    private final Runnable hideVolumeContainer = new Runnable() {
+        @Override
+        public void run() {
+            hideVolumeBar();
+        }
+    };
+    private final Runnable hideBrightnessBarContainer = new Runnable() {
+        @Override
+        public void run() {
+            hideBrightnessBar();
+        }
+    };
 
     private AudioManager audioManager;
     private ContentResolver cResolver;
     private Window window;
     private Display display;
     private Point size;
-    private int sWidth, sHeight, brightness, mediaVolume;
+    private float brightness;
+    private int sWidth, sHeight, mediaVolume;
     private SimpleExoPlayer simpleExoPlayer;
     private PlayerView playerView;
     private LinearLayout root, unlockPanel, controlsLinearLayout, brightnessBarContainer, brightnessCenterText, volumeBarContainer, volumeCenterText;
     private long totalDuration, diffX, diffY;
     float baseX, baseY;
-    private boolean isStopped = false, intLeft, intRight, intBottom, intTop, screen_swipe_move, tested_ok;
+    private boolean isStopped = false, intLeft, intRight, intBottom, intTop, screen_swipe_move, tested_ok, mBackstackLost = false;
     private int initialSystemUiVisibility;
     int uiImmersiveOptions = (
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
@@ -106,7 +127,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     MediaItem mediaItem;
 
 
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -114,29 +134,29 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         if (musicService != null && !musicService.is_mediaPlayerNull() && musicService.isPlaying() && musicService.actionPlaying != null) {
             musicService.actionPlaying.playPauseBtnClicked();
         }
-        init();
+        init(getIntent());
         play();
     }
 
     private void setMediaData() {
         total_duration.setText(milliSecondsToTimer(totalDuration));
-        seekBar.setMax(100);
 //        animateProgression();
 
         VideoPlayerActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 if (isStopped) handler.removeCallbacks(this);
-                seekBar.setProgress((int) ((simpleExoPlayer.getCurrentPosition() * 100) / simpleExoPlayer.getDuration()));
+                seekBar.setProgress((int) (simpleExoPlayer.getCurrentPosition()));
                 current_time.setText(milliSecondsToTimer(simpleExoPlayer.getCurrentPosition()));
-                handler.postDelayed(this, 1000);
+                handler.post(this);
             }
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
-                    simpleExoPlayer.seekTo((progress * 100) / totalDuration);
+                    simpleExoPlayer.seekTo(progress);
+//                    showAllControls();
                 }
             }
 
@@ -237,7 +257,11 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     @Override
     protected void onResume() {
         super.onResume();
-        simpleExoPlayer.play();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            if (isInPictureInPictureMode()) {
+//            } else
+//                simpleExoPlayer.play();
+//        }
     }
 
     private void play() {
@@ -286,6 +310,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                 if (playbackState == Player.STATE_READY) {
                     progressBar.setVisibility(View.GONE);
                     totalDuration = simpleExoPlayer.getDuration();
+                    seekBar.setMax((int) totalDuration);
                     setMediaData();
 
                 }
@@ -307,7 +332,10 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     }
 
 
-    private void init() {
+    private void init(Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            pictureInPictureParams = new PictureInPictureParams.Builder();
+        }
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         decorView = getWindow().getDecorView();
         initialSystemUiVisibility = decorView.getSystemUiVisibility();
@@ -366,7 +394,6 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         video_title = findViewById(R.id.video_title_video_player_activity);
         total_duration = findViewById(R.id.txt_totalDuration_video_player_activity);
         current_time = findViewById(R.id.txt_currentTime_video_player_activity);
-        Intent intent = getIntent();
         currentVideo = (ArrayList<VideoFiles>) intent.getSerializableExtra(VIDEO_FILES);
         //***for this to work , video files must extend serializable***
         position = intent.getIntExtra(VIDEO_FILES_POS, -1);
@@ -412,17 +439,35 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        if (simpleExoPlayer != null && simpleExoPlayer.isPlaying()) {
+//            simpleExoPlayer.stop();
+            releasePlayer();
+        }
+    }
+
+    @Override
     protected void onDestroy() {
-        releasePlayer();
-        finish();
+//        releasePlayer();
+//        finish();
         super.onDestroy();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        releasePlayer();
-        finish();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+//            if (isInPictureInPictureMode()) {
+//                Toast.makeText(this, "pause called when in pip", Toast.LENGTH_SHORT).show();
+//            } else {
+//                releasePlayer();
+//                finish();
+//            }
+//        } else {
+//            releasePlayer();
+//            finish();
+//        }
     }
 
     @Override
@@ -528,6 +573,38 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         handler.postDelayed(hideControls, 3000);
     }
 
+    private void showVolumeBar() {
+        volumeBarContainer.setVisibility(View.VISIBLE);
+        handler.removeCallbacks(hideVolumeContainer);
+        handler.postDelayed(hideVolumeContainer, 900);
+    }
+
+    private void hideVolumeBar() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            Transition transition = new Fade();
+            transition.setDuration(500);
+            transition.addTarget(volumeBarContainer);
+            TransitionManager.beginDelayedTransition((ViewGroup) volumeBarContainer.getRootView(), transition);
+        }
+        volumeBarContainer.setVisibility(View.GONE);
+    }
+
+    private void showBrightnessBar() {
+        brightnessBarContainer.setVisibility(View.VISIBLE);
+        handler.removeCallbacks(hideBrightnessBarContainer);
+        handler.postDelayed(hideBrightnessBarContainer, 900);
+    }
+
+    private void hideBrightnessBar() {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            Transition transition = new Fade();
+            transition.setDuration(500);
+            transition.addTarget(brightnessBarContainer);
+            TransitionManager.beginDelayedTransition((ViewGroup) brightnessBarContainer.getRootView(), transition);
+        }
+        brightnessBarContainer.setVisibility(View.GONE);
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         return super.onTouchEvent(event);
@@ -550,8 +627,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             }
             baseX = ev.getX();
             baseY = ev.getY();
-            diffX = 0;
-            diffY = 0;
+//            diffX = 0;
+//            diffY = 0;
         }
 //            int upperLimit = (sHeight / 4) + 100;
 //            int lowerLimit = ((sHeight / 4) * 3) - 150;
@@ -574,32 +651,32 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                 screen_swipe_move = true;
                 if (controlsState == ControlsMode.FULLCONTROLS) {
 //                root.setVisibility(View.GONE);
-                    hideAllControls();
                     diffX = (long) (Math.ceil(ev.getX() - baseX));
                     diffY = (long) (Math.ceil(ev.getY() - baseY));
                     double brightnessSpeed = 0.08;
-//                if (Math.abs(diffY) > MIN_DISTANCE) {
-//                    tested_ok = true;
-//                }
                     if (Math.abs(diffY) > Math.abs(diffX)) { //checking vertical swipe
 
                         if (intLeft) {  //checking vertical swipe in left corner
                             cResolver = getContentResolver();
                             window = getWindow();
-                            try {
-                                Settings.System.putInt(cResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
-                                brightness = Settings.System.getInt(cResolver, Settings.System.SCREEN_BRIGHTNESS);
-                            } catch (Settings.SettingNotFoundException e) {
-                                e.printStackTrace();
-                            }
-                            int new_brightness = (int) (brightness - (diffY * brightnessSpeed));
+//                            try {
+//                                Settings.System.putInt(cResolver, Settings.System.SCREEN_BRIGHTNESS_MODE, Settings.System.SCREEN_BRIGHTNESS_MODE_MANUAL);
+//                                brightness = Settings.System.getInt(cResolver, Settings.System.SCREEN_BRIGHTNESS);
+//                            } catch (Settings.SettingNotFoundException e) {
+//                                e.printStackTrace();
+//                            }
+                            WindowManager.LayoutParams layoutParams = window.getAttributes();
+                            if (brightness == 0)
+                                brightness = layoutParams.screenBrightness;
+                            float new_brightness = (float) (brightness - (diffY * brightnessSpeed));
                             if (new_brightness > 250) {  //max is 250
                                 new_brightness = 250;
                             } else if (new_brightness < 1) {
                                 new_brightness = 1;  //min is 1
                             }
                             double brightPerc = Math.ceil((((double) new_brightness / (double) 250) * (double) 100));
-                            brightnessBarContainer.setVisibility(View.VISIBLE);
+//                            brightnessBarContainer.setVisibility(View.VISIBLE);
+                            showBrightnessBar();
 //                        brightnessCenterText.setVisibility(View.VISIBLE);
                             brightnessProgressBar.setProgress((int) brightPerc);
                             brightness_txt.setText(String.valueOf(brightPerc).replace(".0", "") + "%");
@@ -610,10 +687,10 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                             } else if (brightPerc > 80) {
                                 brightness_icon.setImageResource(R.drawable.full_brightness);
                             }
-                            Settings.System.putInt(cResolver, Settings.System.SCREEN_BRIGHTNESS, new_brightness);
-//                        WindowManager.LayoutParams layoutParams = window.getAttributes();
-//                        layoutParams.screenBrightness = brightness / (float) 225;
-//                        window.setAttributes(layoutParams);
+//                            Settings.System.putInt(cResolver, Settings.System.SCREEN_BRIGHTNESS, new_brightness);
+                            layoutParams.screenBrightness = new_brightness / (float) 250;
+                            window.setAttributes(layoutParams);
+                            brightness = new_brightness;
 
                         }//brightness if statement
                         else if (intRight) {
@@ -635,7 +712,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                             } else if (volPer >= 1) {
                                 volume_icon.setImageResource(R.drawable.ic_baseline_volume);
                             }
-                            volumeBarContainer.setVisibility(View.VISIBLE);
+                            showVolumeBar();
                             volumeProgressBar.setProgress((int) volPer);
                             volume_txt.setText((String.valueOf(volPer)).replace(".0", "") + "%");
 
@@ -654,7 +731,9 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                 screen_swipe_move = false;
                 tested_ok = false;
                 brightnessBarContainer.setVisibility(View.GONE);
-                volumeBarContainer.setVisibility(View.GONE);
+//                volumeBarContainer.setVisibility(View.GONE);
+                hideVolumeBar();
+                hideBrightnessBar();
                 if (root.getVisibility() == View.GONE) {
                     showAllControls();
                     if (!simpleExoPlayer.isPlaying()) {
@@ -662,7 +741,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                     }
                 } else {
                     int[] arr = new int[2];
-                    seekBar.getLocationOnScreen(arr);
+                    total_duration.getLocationOnScreen(arr);
                     if (ev.getY() > arr[1]) {
                         if (simpleExoPlayer.isPlaying())
                             handler.removeCallbacks(hideControls);
@@ -692,5 +771,68 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             position = 0;
         releasePlayer();
         play();
+    }
+
+    private void pictureInPictureMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Rational aspectRation = new Rational(playerView.getWidth(), playerView.getHeight());
+            pictureInPictureParams.setAspectRatio(aspectRation).build();
+            enterPictureInPictureMode(pictureInPictureParams.build());
+        }
+    }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (!isInPictureInPictureMode()) {
+                pictureInPictureMode();
+            }
+//            else {
+//                releasePlayer();
+//                finish();
+//            }
+        }
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+        if (isInPictureInPictureMode) {
+//            getActionBar().hide();
+            mBackstackLost = true;
+            hideAllControls();
+            hideBrightnessBar();
+            hideVolumeBar();
+        }
+        else {
+//            getActionBar().show();
+//            showAllControls();
+
+        }
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        releasePlayer();
+//        moveTaskToBack(false);
+        init(intent);
+        play();
+    }
+
+    @Override
+    public void finish() {
+        if( mBackstackLost ){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                finishAndRemoveTask();
+            }
+//            startActivity(
+//                    Intent.makeRestartActivityTask(
+//                            new ComponentName(this, MainActivity.class)));
+            startActivity(new Intent(this, MainActivity.class));
+        } else {
+            super.finish();
+        }
     }
 }

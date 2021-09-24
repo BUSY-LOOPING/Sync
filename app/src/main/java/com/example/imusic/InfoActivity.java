@@ -1,10 +1,6 @@
 package com.example.imusic;
 
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-
 import android.annotation.SuppressLint;
-import android.media.MediaCodec;
 import android.media.MediaCodecInfo;
 import android.media.MediaCodecList;
 import android.media.MediaExtractor;
@@ -12,15 +8,15 @@ import android.media.MediaFormat;
 import android.media.MediaMetadataRetriever;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+
 import com.bumptech.glide.Glide;
 
-import java.io.File;
-import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
@@ -69,11 +65,9 @@ public class InfoActivity extends AppCompatActivity {
             }
             length.setText(formattedLength(milliSec / 1000));
 
-            Double tempSizeLong = Double.parseDouble((musicFiles.getSize()));
-            tempSizeLong /= 1000000;
+            long tempSizeLong = Long.parseLong((musicFiles.getSize()));
             DecimalFormat dec = new DecimalFormat("#0.00");
-            String tempSize = dec.format(tempSizeLong) + " MB";
-            size.setText(tempSize);
+            size.setText(InfoActivityVideo.humanReadableByteCountBin(tempSizeLong));
             MediaExtractor mex = new MediaExtractor();
             try {
                 mex.setDataSource(musicFiles.getPath());
@@ -100,7 +94,7 @@ public class InfoActivity extends AppCompatActivity {
                 if (codecInfo.isEncoder())
                 {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                        codec.setText("Codec : " + codecInfo.getCanonicalName());
+                        codec.setText("Codec : " + codecInfo.getName());
                     }
                     else
                     {
@@ -142,15 +136,26 @@ public class InfoActivity extends AppCompatActivity {
     }
 
     private String formattedLength(int lengthInSec) {  //mCurrentPosition is in seconds
-        String totalout = "";
-        String totalnew = "";
-        String seconds = String.valueOf(lengthInSec % 60);
-        String minutes = String.valueOf(lengthInSec / 60);
-        totalout = minutes + "min " + seconds + "s";
-        totalnew = minutes + "min " + "0" + seconds + "s";
-        if (seconds.length() == 1) {
-            return totalnew;
-        } else
-            return totalout;
+        String result;
+        int sec, min = 0, hours = 0;
+        while (lengthInSec >= 60) {
+            lengthInSec = lengthInSec - 60;
+            min++;
+            if (min == 60) {
+                hours++;
+                min = 0;
+            }
+        }
+        sec = lengthInSec;
+        StringBuilder stringBuilder = new StringBuilder();
+        if (hours == 0 && min == 0)
+            stringBuilder.append(sec).append("sec");
+        if (hours == 0 && min != 0)
+            stringBuilder.append(min).append("min").append(sec).append("sec");
+        if (hours != 0)
+            stringBuilder.append(hours).append("hr").append(min).append("min").append(sec).append("sec");
+
+        result = stringBuilder.toString();
+        return result;
     }
 }

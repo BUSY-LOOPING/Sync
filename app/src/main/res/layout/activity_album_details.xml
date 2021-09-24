@@ -68,6 +68,7 @@
         android:layout_width="wrap_content"
         app:borderWidth="0dp"
         android:backgroundTint="@color/white"
+        app:tint="@color/folder_color"
         app:fabCustomSize="60dp"
         app:maxImageSize="40dp"
         android:layout_height="wrap_content"

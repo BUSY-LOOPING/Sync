@@ -61,8 +61,8 @@ public class AlbumDetails extends AppCompatActivity {
 
             if (!(albumSongs.size() < 1)) {
                 albumDetailsAdapter = new AlbumDetailsAdapter(this, albumSongs);
-                albumDetailsAdapter.setHasStableIds(true);
-                recyclerView.setHasFixedSize(true);
+//                albumDetailsAdapter.setHasStableIds(true);
+                recyclerView.setHasFixedSize(false);
                 recyclerView.setAdapter(albumDetailsAdapter);
                 recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
             }

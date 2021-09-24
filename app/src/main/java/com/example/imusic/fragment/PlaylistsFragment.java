@@ -1,5 +1,6 @@
 package com.example.imusic.fragment;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,6 +29,7 @@ public class PlaylistsFragment extends Fragment implements SwipeRefreshLayout.On
     private ArrayList<String> startingCharList;
     private PlaylistFragmentMainAdapter adapter;
     private final Handler handler = new Handler();
+    private Context context;
 
     public PlaylistsFragment() {
 
@@ -42,6 +45,12 @@ public class PlaylistsFragment extends Fragment implements SwipeRefreshLayout.On
     }
 
     @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        this.context = context;
+    }
+
+    @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -54,8 +63,8 @@ public class PlaylistsFragment extends Fragment implements SwipeRefreshLayout.On
         View view = inflater.inflate(R.layout.fragment_playlists, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.main_recyclerView_fragment_playlist);
         startingCharList = getCharacterList();
-        adapter = new PlaylistFragmentMainAdapter(getContext(), startingCharList, recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new PlaylistFragmentMainAdapter(context, startingCharList, recyclerView);
+        recyclerView.setLayoutManager(new LinearLayoutManager(context));
         recyclerView.setHasFixedSize(false);
         recyclerView.setAdapter(adapter);
         swipeRefreshLayout = view.findViewById(R.id.swipe_container_fragment_playlist);
@@ -72,7 +81,7 @@ public class PlaylistsFragment extends Fragment implements SwipeRefreshLayout.On
 
     private ArrayList<String> getCharacterList() {
         ArrayList<String> temp = new ArrayList<>();
-        DataBaseHelperPlaylist db = new DataBaseHelperPlaylist(getContext(), PLAYLIST_NAME, null, 1);
+        DataBaseHelperPlaylist db = new DataBaseHelperPlaylist(context, PLAYLIST_NAME, null, 1);
         Cursor res = db.getAllData();
         if (res != null) {
             while (res.moveToNext()) {

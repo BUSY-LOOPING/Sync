@@ -121,6 +121,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryAdapter.HistoryA
             public void onClick(View view) {
                 if (playlistFiles.get(holder.getAdapterPosition()).isMusicFile) {
                     Intent intent = new Intent(mContext, PlayerActivity.class);
+                    PlayerActivity.prevPlayedId = "";
                     intent.putExtra("sender" , "historyAdapter");
                     intent.putExtra("position", 0);
                     ArrayList<MusicFiles> temp = new ArrayList<>();

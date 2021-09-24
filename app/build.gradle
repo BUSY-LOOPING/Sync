@@ -82,5 +82,7 @@ dependencies {
 
     implementation 'com.h6ah4i.android.widget.verticalseekbar:verticalseekbar:0.7.0'
 
+    implementation 'com.github.luizgrp:SectionedRecyclerViewAdapter:v3.2.0'
+
 
 }

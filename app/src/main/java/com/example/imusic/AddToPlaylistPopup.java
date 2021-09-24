@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -37,7 +38,7 @@ public class AddToPlaylistPopup extends BottomSheetDialogFragment {
     private ArrayList<PlaylistFiles> playlistFiles = new ArrayList<>();
     private ArrayList<MusicFiles> musicFiles = new ArrayList<>();
     private ArrayList<VideoFiles> videoFiles = new ArrayList<>();
-    private Thread thread;
+    private Handler handler = new Handler();
 
     private ProgressBar progressBar;
     private View view;
@@ -154,33 +155,6 @@ public class AddToPlaylistPopup extends BottomSheetDialogFragment {
                 new getFilesInParent().execute("start");
             }
         }
-    }
-
-    public void init() {
-//        addToPlaylistDialog = new BottomSheetDialog(mContext, R.style.BottomSheetAddToPlaylist);
-//        addToPlaylistView = LayoutInflater.from(mContext).inflate(R.layout.add_to_playlist, view.findViewById(R.id.addToPlaylistContainer));
-//        addToPlaylistDialog.setContentView(addToPlaylistView);
-//        progressBar = addToPlaylistView.findViewById(R.id.progress_bar_add_to_playlist);
-//        RecyclerView recyclerView = addToPlaylistDialog.findViewById(R.id.add_to_playlist_RecyclerView);
-//        editText = addToPlaylistView.findViewById(R.id.editText_add_to_playlist);
-//        addBtn = addToPlaylistView.findViewById(R.id.addBtn_add_to_playlist);
-//        no_media1 = addToPlaylistView.findViewById(R.id.no_media_add_to_playlist);
-//        no_media2 = addToPlaylistView.findViewById(R.id.no_media_add_to_playlist_2);
-//        db = new DataBaseHelperPlaylist(mContext, PLAYLIST_NAME, null, 1);
-
-//        ArrayList<PlaylistFiles> playlistFiles = getPlaylistFiles();
-//        AddToPlaylistPopupRecyclerAdapter adapter = new AddToPlaylistPopupRecyclerAdapter(mContext, playlistFiles);
-//        recyclerView.setLayoutManager(new LinearLayoutManager(mContext));
-//        recyclerView.setAdapter(adapter);
-//        if (playlistFiles.size() <= 0) {
-//            recyclerView.setVisibility(View.GONE);
-//            TextView textView = addToPlaylistView.findViewById(R.id.no_playlist_found);
-//            textView.setVisibility(View.VISIBLE);
-//        }
-
-//        ArrayList<MusicFiles> musicFiles = getAllAudio(mContext);
-//        ArrayList<VideoFiles> videoFiles = getAllVideos(mContext);
-
     }
 
     private int cal_total_no_media(ArrayList<PlaylistFiles> playlistFiles) {
@@ -394,10 +368,30 @@ public class AddToPlaylistPopup extends BottomSheetDialogFragment {
 
     public void addMusicFiles(ArrayList<MusicFiles> musicFiles) {
         this.musicFiles = musicFiles;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                if (progressBar != null && no_media1 != null && no_media2 != null) {
+                    progressBar.setVisibility(View.GONE);
+                    no_media1.setVisibility(View.VISIBLE);
+                    no_media2.setVisibility(View.VISIBLE);
+                    no_media1.setText((musicFiles.size() + videoFiles.size()) + " media");
+                    no_media2.setText((musicFiles.size() + videoFiles.size()) + " media");
+                    handler.removeCallbacks(this);
+                }
+                else
+                    handler.post(this);
+            }
+        });
     }
 
     public void addVideoFiles(ArrayList<VideoFiles> videoFiles){
         this.videoFiles = videoFiles;
+        progressBar.setVisibility(View.GONE);
+        no_media1.setVisibility(View.VISIBLE);
+        no_media2.setVisibility(View.VISIBLE);
+        no_media1.setText((musicFiles.size() + videoFiles.size()) + " media");
+        no_media2.setText((musicFiles.size() + videoFiles.size()) + " media");
     }
 
     public void addToExistingPlaylist(String playListName){

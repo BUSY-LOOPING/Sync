@@ -21,7 +21,7 @@
 
     <LinearLayout
         android:id="@+id/option1"
-        android:background="?attr/selectableItemBackground"
+        android:background="@drawable/custom_ripple_add_to_playlist"
         android:layout_marginTop="5dp"
         android:layout_width="match_parent"
         android:layout_height="55dp"

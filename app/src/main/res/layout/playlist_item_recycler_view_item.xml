@@ -30,12 +30,12 @@
             android:layout_marginEnd="4dp"
             android:layout_marginBottom="4dp"
             app:backgroundTint="@color/white"
-            app:tint="#404040"
             app:borderWidth="0dp"
             app:fabCustomSize="35dp"
             app:maxImageSize="30dp"
             app:rippleColor="@color/ripple_color"
-            app:srcCompat="@drawable/ic_play" />
+            app:srcCompat="@drawable/ic_play"
+            app:tint="#404040" />
 
         <LinearLayout
             android:layout_width="wrap_content"

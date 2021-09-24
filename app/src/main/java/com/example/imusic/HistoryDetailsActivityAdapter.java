@@ -1,5 +1,6 @@
 package com.example.imusic;
 
+import static com.example.imusic.InfoActivityVideo.VIDEO_FILE_INFO_ACT;
 import static com.example.imusic.VideoAdapter.VIDEO_FILES;
 import static com.example.imusic.VideoAdapter.VIDEO_FILES_POS;
 
@@ -64,6 +65,8 @@ public class HistoryDetailsActivityAdapter extends RecyclerView.Adapter<HistoryD
                     playlistFiles.get(position).isVideoFile && selectedList.get(0).getVideoFiles().getId().equals(playlistFiles.get(position).getVideoFiles().getId())) {
                 holder.itemView.setBackgroundResource(R.color.ripple_color_light);
             }
+            else
+                holder.itemView.setBackgroundResource(R.drawable.custom_ripple);
         } else {
             holder.itemView.setBackgroundResource(R.drawable.custom_ripple);
         }
@@ -199,6 +202,7 @@ public class HistoryDetailsActivityAdapter extends RecyclerView.Adapter<HistoryD
                                     Intent intent1;
                                     if (playlistFiles.get(position).isVideoFile) {
                                         intent1 = new Intent(mContext, InfoActivityVideo.class);
+                                        intent1.putExtra(VIDEO_FILE_INFO_ACT, playlistFiles.get(position).getVideoFiles());
                                     } else {
                                         intent1 = new Intent(mContext, InfoActivity.class);
                                         ArrayList<MusicFiles> temp = new ArrayList<>();

@@ -83,10 +83,25 @@ public class DataBaseHelperPlaylist extends SQLiteOpenHelper {
 //        db.close();
     }
 
+    public void deleteForPlaylistName(String playlistName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(TABLE_NAME, " playlistName = ? ", new String[]{playlistName});
+//        db.close();
+    }
+
     public void check() {
         Cursor cursor = getAllData();
-        checkIfExists checkIfExists = new checkIfExists(cursor);
-        checkIfExists.execute("start");
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String path = cursor.getString(3);
+                String id = cursor.getString(8);
+                if (!new File(path).exists()) {
+                    deleteForId(id);
+                }
+            }
+        }
+//        checkIfExists checkIfExists = new checkIfExists(cursor);
+//        checkIfExists.execute("start");
     }
 
     private class checkIfExists extends AsyncTask<String, String, String> {

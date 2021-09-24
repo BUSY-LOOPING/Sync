@@ -141,17 +141,17 @@ public class DataBaseHelperHistory extends SQLiteOpenHelper {
 
     public void check() {
         Cursor cursor = getAllData();
-//        if (cursor != null) {
-//            while (cursor.moveToNext()) {
-//                String path = cursor.getString(2);
-//                String id = cursor.getString(7);
-//                if (!new File(path).exists()) {
-//                    deleteForId(id);
-//                }
-//            }
-//        }
-        checkIfExists checkIfExists = new checkIfExists(cursor);
-        checkIfExists.execute("start");
+        if (cursor != null) {
+            while (cursor.moveToNext()) {
+                String path = cursor.getString(2);
+                String id = cursor.getString(7);
+                if (!new File(path).exists()) {
+                    deleteForId(id);
+                }
+            }
+        }
+//        checkIfExists checkIfExists = new checkIfExists(cursor);
+//        checkIfExists.execute("start");
     }
 
     private class checkIfExists extends AsyncTask<String, String, String> {
