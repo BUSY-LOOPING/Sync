@@ -36,7 +36,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import com.example.imusic.ApplicationClass;
 import com.example.imusic.DeleteMusicFile;
+import com.example.imusic.MainActivity;
 import com.example.imusic.MusicAdapter;
 import com.example.imusic.MusicFiles;
 import com.example.imusic.MySortByName;
@@ -59,6 +61,7 @@ public class SongsFragment extends Fragment implements OnItemClickListenerMusicA
     DeleteMusicFile deleteMusicFile;
     private Context context;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private ApplicationClass ref;
 
     public SongsFragment() {
     }
@@ -67,7 +70,7 @@ public class SongsFragment extends Fragment implements OnItemClickListenerMusicA
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-        Log.d("mytag", "OnCreate Songs Fragment");
+        ref = (ApplicationClass) ((MainActivity)context).getApplication();
     }
 
     @Nullable
@@ -83,7 +86,7 @@ public class SongsFragment extends Fragment implements OnItemClickListenerMusicA
         View view = inflater.inflate(R.layout.fragment_songs, container, false);
         RecyclerView recyclerView = view.findViewById(R.id.recyclerView);
         recyclerView.setHasFixedSize(true);
-        recyclerView.setItemViewCacheSize(8);
+//        recyclerView.setItemViewCacheSize(8);
         recyclerView.setItemAnimator(new DefaultItemAnimator() {
             @Override
             public boolean canReuseUpdatedViewHolder(@NonNull RecyclerView.ViewHolder viewHolder) {
@@ -102,7 +105,6 @@ public class SongsFragment extends Fragment implements OnItemClickListenerMusicA
         swipeRefreshLayout = view.findViewById(R.id.swipe_container_fragment_songs);
         swipeRefreshLayout.setOnRefreshListener(this);
         swipeRefreshLayout.setColorSchemeResources(R.color.tab_highlight, R.color.white);
-
         return view;
     }
 
@@ -155,6 +157,8 @@ public class SongsFragment extends Fragment implements OnItemClickListenerMusicA
         super.onAttach(context);
         this.context = context;
     }
+
+
 
     private void deleteFile(int position, View v) {
         Snackbar snackbar = Snackbar.make(v, "Delete the file ' " + musicAdapter.getFiles().get(position).getTitle() + " '", Snackbar.LENGTH_LONG)

@@ -278,6 +278,10 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     void pause() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+//            stopForeground(STOP_FOREGROUND_DETACH);
+//        else
+//            stopForeground(false);
         mediaPlayer.pause();
         editor.putString("initialized", "true");
         editor.putString(NOW_PLAYING, "false");
@@ -326,10 +330,13 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     void showNotification(int playPauseBtn) {
+        boolean onGoing = false;
         if (mediaPlayer.isPlaying()) {
             playPauseBtn = R.drawable.ic_pause;
+            onGoing = true;
         } else {
             playPauseBtn = R.drawable.ic_play;
+            onGoing = false;
         }
         Intent intent = new Intent(this, MainActivity.class).putExtra("fromNotificationTap", "fromNotificationTap");
 //        intent.setAction(Intent.ACTION_MAIN);
@@ -370,16 +377,17 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                 .setLargeIcon(thumb)
                 .setContentTitle(nowPlayingFile.getTitle())
                 .setContentText(nowPlayingFile.getArtist())
-                .addAction(R.drawable.ic_skip_previous, "Previous", prevPendingIntent)
+                .addAction(R.drawable.ic_skip_previous_rounded, "Previous", prevPendingIntent)
                 .addAction(playPauseBtn, "Pause", pausePendingIntent)
-                .addAction(R.drawable.ic_skip_next, "Next", nextPendingIntent)
+                .addAction(R.drawable.ic_skip_next_rounded, "Next", nextPendingIntent)
                 .setStyle(
                         new androidx.media.app.NotificationCompat.MediaStyle()
                 )
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .setChannelId(CHANNEL_ID_2)
-                .setShowWhen(isPlaying())
+//                .setShowWhen(isPlaying())
                 .setSound(null)
+                .setOngoing(onGoing)
                 .setVibrate(null)
                 .setTimeoutAfter(timeOut)
                 .build();
@@ -415,10 +423,11 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
     }
 
     public void demoteNotifyBar() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-            stopForeground(STOP_FOREGROUND_DETACH);
-        else
-            stopForeground(false);
+        stopForeground(false);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+//            stopForeground(false);
+//        else
+//            stopForeground(false);
         SharedPreferences.Editor editor = getSharedPreferences("demoteNotifyBar", MODE_PRIVATE).edit();
         editor.putBoolean("demoted", true);
         editor.apply();
@@ -443,11 +452,9 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
         miniPlayer.nextBtn.setOnClickListener(this);
         miniPlayer.prevBtn.setOnClickListener(this);
         miniPlayer.repeatBtn.setOnClickListener(this);
-        miniPlayer.searchBtn.setOnClickListener(this);
         miniPlayer.moreBtn.setOnClickListener(this);
         miniPlayer.tb_img.setOnCheckedChangeListener(this);
         miniPlayer.seekBar.setOnSeekBarChangeListener(this);
-//        miniPlayer.tb_img.setOnClickListener(this);
     }
 
     @SuppressLint("NonConstantResourceId")
@@ -475,9 +482,6 @@ public class MusicService extends Service implements MediaPlayer.OnCompletionLis
                         miniPlayer.repeatBtn.setColorFilter(ContextCompat.getColor(getApplicationContext(), R.color.tab_highlight), android.graphics.PorterDuff.Mode.SRC_IN);
                     else
                         miniPlayer.repeatBtn.setColorFilter(null);
-                    break;
-                case R.id.search_miniPlayer:
-                    Toast.makeText(getApplicationContext(), "search", Toast.LENGTH_SHORT).show();
                     break;
                 case R.id.more_mini_player:
                     Toast.makeText(getApplicationContext(), "more", Toast.LENGTH_SHORT).show();

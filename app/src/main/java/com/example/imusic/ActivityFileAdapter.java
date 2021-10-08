@@ -1,6 +1,5 @@
 package com.example.imusic;
 
-import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
@@ -56,7 +55,7 @@ public class ActivityFileAdapter extends RecyclerView.Adapter<ActivityFileAdapte
         return new MyActivityFileViewHolder(view, mListener);
     }
 
-    @SuppressLint("UseCompatLoadingForDrawables")
+//    @SuppressLint("UseCompatLoadingForDrawables")
     @Override
     public void onBindViewHolder(@NonNull ActivityFileAdapter.MyActivityFileViewHolder holder, int position) {
         holder.folder_file_name.setText(list.get(position).getName());
@@ -87,12 +86,12 @@ public class ActivityFileAdapter extends RecyclerView.Adapter<ActivityFileAdapte
 
     }
 
-    private boolean isVideoFile(String path) {
+    public static boolean isVideoFile(String path) {
         String mimeType = URLConnection.guessContentTypeFromName(path);
         return mimeType != null && mimeType.startsWith("video");
     }
 
-    private boolean isMusicFile(String path) {
+    public static boolean isMusicFile(String path) {
         String mimeType = URLConnection.guessContentTypeFromName(path);
         return mimeType != null && mimeType.startsWith("audio");
     }

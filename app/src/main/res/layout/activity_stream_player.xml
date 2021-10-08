@@ -14,10 +14,10 @@
         android:keepScreenOn="true"
         app:autoPlay="false"
         app:showFullScreenButton="false"
-        app:showSeekBar="false"
-        app:showVideoCurrentTime="false"
-        app:showVideoDuration="false"
+        app:showSeekBar="true"
+        app:showVideoCurrentTime="true"
+        app:showVideoDuration="true"
         app:showYouTubeButton="false"
-        app:useWebUi="true" />
+        app:useWebUi="false" />
 
 </FrameLayout>

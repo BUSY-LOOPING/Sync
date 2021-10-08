@@ -210,10 +210,10 @@ public class PlaylistContentAdapter extends RecyclerView.Adapter<PlaylistContent
     }
 
 
-    @Override
-    public long getItemId(int position) {
-        return position;
-    }
+//    @Override
+//    public long getItemId(int position) {
+//        return position;
+//    }
 
     public class PlaylistContentAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnTouchListener, View.OnLongClickListener {
         TextView name, description;
@@ -237,7 +237,7 @@ public class PlaylistContentAdapter extends RecyclerView.Adapter<PlaylistContent
         @Override
         public void onClick(View view) {
             if (view.getId() == itemView.getId()) {
-                listener.onClick();
+                listener.onClick(playlistFiles, getAdapterPosition());
             }
             if (view.getId() == R.id.more_playlist_content_item) {
                 listener.moreClick();

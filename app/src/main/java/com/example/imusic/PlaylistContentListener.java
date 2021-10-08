@@ -2,6 +2,8 @@ package com.example.imusic;
 
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
+
 public interface PlaylistContentListener {
     /**
      * Called when a view is requesting a start of a drag.
@@ -10,7 +12,7 @@ public interface PlaylistContentListener {
      */
     void onStartDrag(RecyclerView.ViewHolder viewHolder);
 
-    void onClick();
+    void onClick(ArrayList<PlaylistFiles> playlistFiles, int pos);
 
     void moreClick();
 

@@ -18,6 +18,7 @@ import android.content.ServiceConnection;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.MediaMetadataRetriever;
@@ -26,6 +27,8 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
@@ -39,6 +42,7 @@ import androidx.appcompat.widget.LinearLayoutCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.widget.ContentLoadingProgressBar;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
@@ -46,8 +50,10 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MiniPlayer implements ServiceConnection {
@@ -58,11 +64,14 @@ public class MiniPlayer implements ServiceConnection {
     public ToggleButton tb_img;
     public String playingFrom = "";
     public ContentLoadingProgressBar bar;
-    public TextView time, song_name, artist;
+    private RelativeLayout peekRelLayout;
+    public TextView time, song_name, artist, bottomTxt;
     public RecyclerView recyclerView;
     public boolean reachedTop = false;
     public ImageView miniPlayPause, album_art, bg, bottomPlayPause, nextBtn, prevBtn, repeatBtn, centerAlbumArt, searchBtn, moreBtn;
     public SeekBar seekBar;
+    private TextInputLayout textInputLayout;
+    public EditText searchViewEditText;
     public boolean isShown = false;
     private BottomSheetBehavior bottomSheetBehavior;
     private Context context;
@@ -76,6 +85,7 @@ public class MiniPlayer implements ServiceConnection {
         public void run() {
             if (bar != null && musicService != null && !musicService.is_mediaPlayerNull()) {
                 if (!MiniPlayer.flag) {
+//                    setBottomTxt();
                     byte[] array = getAlbumArt(musicService.nowPlaying().getPath());
                     if (array != null) {
                         album_art.setVisibility(View.VISIBLE);
@@ -106,11 +116,71 @@ public class MiniPlayer implements ServiceConnection {
                 int mCurrentPosition = musicService.getCurrentPosition();
                 bar.setProgress(mCurrentPosition / 1000);
                 seekBar.setProgress(mCurrentPosition / 1000);
-                time.setText(milliSecondsToTimer(mCurrentPosition));
+                String readableTime = milliSecondsToTimer(mCurrentPosition);
+                time.setText(readableTime);
+                setBottomTxt(txtTime(mCurrentPosition));
                 handler.post(this);
             }
         }
     };
+
+    private String txtTime(int milliseconds) {
+        String finalTimerString = "", secondsString = "";
+
+        // Convert total duration into time
+        int hours = (int) (milliseconds / (1000 * 60 * 60));
+        int minutes = (int) (milliseconds % (1000 * 60 * 60)) / (1000 * 60);
+        int seconds = (int) ((milliseconds % (1000 * 60 * 60)) % (1000 * 60) / 1000);
+        if (hours > 0) {
+            finalTimerString = hours + "h";
+            return finalTimerString;
+        }
+
+        if (minutes > 0) {
+            finalTimerString = minutes + "min";
+            return finalTimerString;
+        }
+
+        // Prepending 0 to seconds if it is one digit
+        if (seconds < 10) {
+            secondsString = "0" + seconds;
+        } else {
+            secondsString = "" + seconds;
+        }
+
+        finalTimerString = secondsString + "s";
+
+        // return timer string
+        return finalTimerString;
+    }
+
+    private void setBottomTxt(String readableTime) {
+        StringBuilder txt = new StringBuilder();
+        txt.append("Track: ");
+        txt.append(PlayerActivity.position + 1);
+        txt.append("/");
+        txt.append(listSongs.size());
+        txt.append(" · Progress: ");
+        txt.append(readableTime);
+        txt.append("/");
+
+
+        int totalDuration = musicService.getDuration();
+        String totalDurationString = "";
+        int dur = totalDuration / (1000 * 60 * 60);
+        totalDurationString = dur + "h";
+        if (dur == 0) {
+            dur = (totalDuration % (1000 * 60 * 60) / (1000 * 60));
+            totalDurationString = dur + "min";
+        }
+        if (dur == 0) {
+            dur = ((totalDuration % (1000 * 60 * 60)) % (1000 * 60) / 1000);
+            totalDurationString = dur + "s";
+        }
+        txt.append(totalDurationString);
+        bottomTxt.setText(txt.toString());
+    }
+
     private LinearLayoutManager llm;
     private MiniPlayerRecyclerViewAdapter adapter;
     private AnimatedVectorDrawableCompat avd;
@@ -135,12 +205,39 @@ public class MiniPlayer implements ServiceConnection {
         MiniPlayer.flag = flag;
     }
 
+    ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN,
+            ItemTouchHelper.RIGHT | ItemTouchHelper.LEFT) {
+        @Override
+        public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+            int startPos = viewHolder.getAdapterPosition();
+            int endPos = target.getAdapterPosition();
+            Collections.swap(listSongs, startPos, endPos);
+            adapter.notifyItemMoved(startPos, endPos);
+            int index = listSongs.indexOf(musicService.nowPlaying());
+            PlayerActivity.position = index;
+            if (musicService.nowPlaying().getId().equals(adapter.getNowPlaying().getId())) {
+                MiniPlayerRecyclerViewAdapter.prevPos = index;
+            }
+            return true;
+        }
+
+        @Override
+        public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            int pos = viewHolder.getAdapterPosition();
+            listSongs.remove(pos);
+            adapter.notifyItemRemoved(pos);
+            if (pos < PlayerActivity.position) {
+                PlayerActivity.position--;
+            }
+        }
+    };
+
     private void setRecyclerView() {
 //        if (listSongs == null || listSongs.size() == 0)
 //            adapter = new MiniPlayerRecyclerViewAdapter(context, musicFiles, recyclerView);
 //        else
         adapter = new MiniPlayerRecyclerViewAdapter(context, listSongs, recyclerView, bg);
-        adapter.setHasStableIds(true);
+        adapter.setHasStableIds(false);
         recyclerView.setHasFixedSize(true);
         recyclerView.setItemViewCacheSize(15);
         llm = new LinearLayoutManager(context);
@@ -171,6 +268,7 @@ public class MiniPlayer implements ServiceConnection {
                 super.onScrolled(recyclerView, dx, dy);
             }
         });
+        new ItemTouchHelper(callback).attachToRecyclerView(recyclerView);
     }
 
     private void init() {
@@ -197,6 +295,7 @@ public class MiniPlayer implements ServiceConnection {
         song_name = view.findViewById(R.id.song_name_mini_player);
         song_name.setSelected(true);
         song_name.setText(sharedPreferences.getString(MUSIC_TITLE, ""));
+        bottomTxt = view.findViewById(R.id.txt_bottom_miniPlayer);
         artist = view.findViewById(R.id.artist_mini_player);
         if (sharedPreferences.getString(MUSIC_ARTIST, "").equals("<unknown>")) {
             artist.setVisibility(View.GONE);
@@ -227,9 +326,43 @@ public class MiniPlayer implements ServiceConnection {
         repeatBtn = view.findViewById(R.id.repeatBtnMiniPlayer);
         if (repeatBoolean) {
             repeatBtn.setColorFilter(ContextCompat.getColor(context, R.color.tab_highlight), android.graphics.PorterDuff.Mode.SRC_IN);
-        }
+        } else
+            repeatBtn.setColorFilter(ContextCompat.getColor(context, R.color.white), PorterDuff.Mode.SRC_IN);
 
         searchBtn = view.findViewById(R.id.search_miniPlayer);
+        searchViewEditText = view.findViewById(R.id.editText);
+        textInputLayout = view.findViewById(R.id.textInputLayout);
+        peekRelLayout = view.findViewById(R.id.relative_layout_mini_player_visible);
+        searchBtn.setOnClickListener(v -> {
+            if (!tb_img.isChecked()) {
+                tb_img.setChecked(true);
+            }
+            for (int i = 0 ; i < peekRelLayout.getChildCount(); i++) {
+                View child = peekRelLayout.getChildAt(i);
+                if (child.getContentDescription() != null && child.getContentDescription().equals("hideable")) {
+                    child.setVisibility(View.INVISIBLE);
+                }
+            }
+            searchViewEditText.setText("");
+            textInputLayout.setVisibility(View.VISIBLE);
+            InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+            imm.showSoftInput(searchViewEditText, InputMethodManager.SHOW_IMPLICIT);
+            searchViewEditText.requestFocus();
+        });
+        searchViewEditText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    for (int i = 0 ; i < peekRelLayout.getChildCount(); i++) {
+                        View child = peekRelLayout.getChildAt(i);
+                        if (child.getContentDescription() != null && child.getContentDescription().equals("hideable")) {
+                            child.setVisibility(View.VISIBLE);
+                        }
+                    }
+                    textInputLayout.setVisibility(View.GONE);
+                }
+            }
+        });
         moreBtn = view.findViewById(R.id.more_mini_player);
         time = relativeLayout.findViewById(R.id.time_mini_player);
 //        imageViewOnClick();
@@ -238,8 +371,14 @@ public class MiniPlayer implements ServiceConnection {
 //            int actionBarHeight = TypedValue.complexToDimensionPixelSize(tv.data, context.getResources().getDisplayMetrics());
 //        }
         tb_img = relativeLayout.findViewById(R.id.toggle_img);
-
-
+        relativeLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (bottomSheetBehavior.getState() == BottomSheetBehavior.STATE_COLLAPSED) {
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+                }
+            }
+        });
         bottomSheetBehavior.addBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
             @Override
             public void onStateChanged(@NonNull View bottomSheet, int newState) {
@@ -334,6 +473,16 @@ public class MiniPlayer implements ServiceConnection {
     @Override
     public void onServiceDisconnected(ComponentName name) {
         musicService = null;
+    }
+
+    public void hideWithAnim() {
+        isShown = false;
+        ViewPager viewPager = view.findViewById(R.id.view_pager_main);
+        viewPager.setPadding(0, 0, 0, 0);
+        if (bottomSheetBehavior != null) {
+            bottomSheetBehavior.setHideable(true);
+            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        }
     }
 
     public void hidePlayer() {

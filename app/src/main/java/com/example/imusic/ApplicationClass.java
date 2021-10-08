@@ -6,7 +6,10 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.os.Build;
 
+import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapter;
+
 public class ApplicationClass extends Application {
+    private SectionedRecyclerViewAdapter sectionedRecyclerViewAdapter;
 
     public static final String CHANNEL_ID_1 = "CHANNEL_1";
     public static final String CHANNEL_ID_2 = "CHANNEL_2";
@@ -18,6 +21,14 @@ public class ApplicationClass extends Application {
     public void onCreate() {
         super.onCreate();
         createNotificationChannel();
+    }
+
+    public void setSectionedRecyclerViewAdapter(SectionedRecyclerViewAdapter sectionedRecyclerViewAdapter) {
+        this.sectionedRecyclerViewAdapter = sectionedRecyclerViewAdapter;
+    }
+
+    public SectionedRecyclerViewAdapter getSectionedRecyclerViewAdapter() {
+        return sectionedRecyclerViewAdapter;
     }
 
     private void createNotificationChannel() {

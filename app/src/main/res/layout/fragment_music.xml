@@ -11,11 +11,11 @@
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         android:background="@color/color_primary"
-        app:tabIndicator="@drawable/tab_indicator"
+        app:tabIndicator="@color/tab_highlight"
         app:tabIndicatorColor="#2196F3"
-        app:tabIndicatorFullWidth="true"
+        app:tabIndicatorFullWidth="false"
         app:tabIndicatorGravity="bottom"
-        app:tabIndicatorHeight="3dp"
+        app:tabIndicatorHeight="2dp"
         app:tabSelectedTextColor="@color/tab_highlight"
         app:tabTextColor="@color/colorAccent" />
 

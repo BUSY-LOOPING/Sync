@@ -19,5 +19,10 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
+    <string name="app_id">C0868879</string>
+    <string name="hideable">hideable</string>
+    <string name="title_activity_about">AboutActivity</string>
+    <string name="tab_text_1">ABOUT</string>
+    <string name="tab_text_2">LICENSE</string>
 
 </resources>

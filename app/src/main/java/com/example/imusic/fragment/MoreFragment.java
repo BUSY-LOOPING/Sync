@@ -11,24 +11,23 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.imusic.AboutActivity;
 import com.example.imusic.DataBaseHelperHistory;
 import com.example.imusic.HistoryAdapter;
 import com.example.imusic.HistoryDetailsActivity;
 import com.example.imusic.MusicFiles;
 import com.example.imusic.PlaylistFiles;
 import com.example.imusic.R;
-import com.example.imusic.SettingsFragment;
+import com.example.imusic.SettingsActivity;
 import com.example.imusic.StreamActivity;
 import com.example.imusic.VideoFiles;
 import com.google.android.material.card.MaterialCardView;
@@ -42,7 +41,7 @@ public class MoreFragment extends Fragment {
     public static final String HISTORY_FILES = "history_files";
     public static HistoryAdapter historyAdapter;
     private Context context;
-    private Button settings;
+    private Button settings, about;
     private FragmentActivity myContext;
     private FloatingActionButton fab;
     private MaterialCardView newStreamBtn;
@@ -80,13 +79,8 @@ public class MoreFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_more, container, false);
-        RelativeLayout relativeLayout = container.getRootView().findViewById(R.id.main_container);
-        fab = relativeLayout.findViewById(R.id.fab_shuffle);
-        settings = view.findViewById(R.id.settings_btn);
-        arrow = view.findViewById(R.id.arrowBtn);
-        recyclerView = view.findViewById(R.id.recyclerView_fragment_more);
+        init(view);
         setRecyclerView();
-        newStreamBtn = view.findViewById(R.id.new_stream_btn);
         newStreamBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -94,20 +88,20 @@ public class MoreFragment extends Fragment {
                 startActivity(intent);
             }
         });
-        settings.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                relativeLayout.setVisibility(View.INVISIBLE);
-                Fragment someFragment = new SettingsFragment();
-                FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
+        settings.setOnClickListener(v -> {
+//            Fragment someFragment = new SettingsFragment();
+//            FragmentTransaction transaction = ((FragmentActivity) context).getSupportFragmentManager().beginTransaction();
 //                transaction.setCustomAnimations(android.R.anim.slide_out_right, 0);
-                transaction.add(android.R.id.content, someFragment); // give your fragment container id in first parameter
-                transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
-                transaction.commit();
+//            transaction.add(android.R.id.content, someFragment); // give your fragment container id in first parameter
+//            transaction.addToBackStack(null);  // if written, this transaction will be added to backstack
+//            transaction.commit();
 //                ViewPager viewPager = container.findViewById(R.id.view_pager_main);
 //                viewPager.setCurrentItem(5);
 //                if (viewPager == null) Toast.makeText(context, "adasdad", Toast.LENGTH_SHORT).show();
-            }
+            startActivity(new Intent(context, SettingsActivity.class));
+        });
+        about.setOnClickListener(v -> {
+            startActivity(new Intent(context, AboutActivity.class));
         });
         arrow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,6 +112,15 @@ public class MoreFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    private void init(View view) {
+        settings = view.findViewById(R.id.settings_btn);
+        about = view.findViewById(R.id.about_btn);
+        arrow = view.findViewById(R.id.arrowBtn);
+        recyclerView = view.findViewById(R.id.recyclerView_fragment_more);
+        newStreamBtn = view.findViewById(R.id.new_stream_btn);
+
     }
 
     @Override

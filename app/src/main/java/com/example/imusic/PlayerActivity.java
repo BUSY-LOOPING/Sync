@@ -219,9 +219,13 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
                 if (repeatBoolean) {
                     repeatBoolean = false;
                     repeatBtn.setImageResource(R.drawable.ic_repeat_rounded);
+                    if (miniPlayer != null)
+                        miniPlayer.repeatBtn.setColorFilter(ContextCompat.getColor(PlayerActivity.this, R.color.white), android.graphics.PorterDuff.Mode.SRC_IN);
                 } else {
                     repeatBoolean = true;
                     repeatBtn.setImageResource(R.drawable.ic_repeat_rounded_selected);
+                    if (miniPlayer != null)
+                        miniPlayer.repeatBtn.setColorFilter(ContextCompat.getColor(PlayerActivity.this, R.color.tab_highlight), android.graphics.PorterDuff.Mode.SRC_IN);
                 }
             }
         });
@@ -624,18 +628,19 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
                     listSongs = albumFiles;
                     editor.putString(PLAYING_FROM, "albumDetails");
                     editor.apply();
-                }
-                if (sender.equals("historyAdapter")) {
+                } else if (sender.equals("historyAdapter")) {
                     listSongs = (ArrayList<MusicFiles>) intent.getSerializableExtra("listSongs");
                     MusicService.flag = true;
-                }
-                if (sender.equals("mainActivity")) {
+                } else if (sender.equals("mainActivity")) {
                     listSongs = mFiles;
                     editor.putString(PLAYING_FROM, "mainActivity");
                     editor.apply();
-                }
-                if (sender.equals("miniPlayerRecyclerViewAdapter")) {
+                } else if (sender.equals("miniPlayerRecyclerViewAdapter")) {
                     listSongs = (ArrayList<MusicFiles>) intent.getSerializableExtra("listSongs");
+                } else if (sender.equals("playlistAdapter")) {
+                    listSongs = (ArrayList<MusicFiles>) intent.getSerializableExtra("listSongs");
+                    editor.putString(PLAYING_FROM, "playlist");
+                    editor.apply();
                 }
             }
         }
@@ -824,6 +829,8 @@ public class PlayerActivity extends AppCompatActivity implements ActionPlaying, 
             }
         });
         imageView.startAnimation(animOut);
+        song_name.startAnimation(animIn);
+        artist_name.startAnimation(animIn);
     }
 
     @Override

@@ -3,14 +3,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="#111111">
+    android:background="#111111"
+    android:orientation="vertical">
 
     <androidx.recyclerview.widget.RecyclerView
-        android:layout_marginTop="15dp"
         android:id="@+id/recyclerView_album_details"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginTop="15dp"
         android:background="#111111"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
@@ -20,18 +20,18 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:theme="@style/Theme.IMusic"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="true"
+        android:theme="@style/Theme.IMusic">
 
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
-            app:contentScrim="@color/color_primary"
             android:layout_width="match_parent"
             android:layout_height="250dp"
             android:background="@color/color_primary"
+            android:fitsSystemWindows="true"
             android:theme="@style/Theme.IMusic"
-            app:layout_scrollFlags="scroll|exitUntilCollapsed"
-            android:fitsSystemWindows="true">
+            app:contentScrim="@color/color_primary"
+            app:layout_scrollFlags="scroll|exitUntilCollapsed">
 
 
             <ImageView
@@ -49,14 +49,14 @@
 
 
             <androidx.appcompat.widget.Toolbar
-                app:navigationIcon="@drawable/ic_chevron_left"
-                app:title="Album Name"
                 android:id="@+id/album_details_album_name"
                 android:layout_width="match_parent"
                 android:layout_height="?actionBarSize"
                 app:layout_collapseMode="pin"
-                app:titleTextColor="@color/white"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Dark">
+                app:navigationIcon="@drawable/ic_chevron_left"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"
+                app:title="Album Name"
+                app:titleTextColor="@color/white">
 
 
             </androidx.appcompat.widget.Toolbar>
@@ -64,18 +64,20 @@
 
 
     </com.google.android.material.appbar.AppBarLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_activity_album_details"
         android:layout_width="wrap_content"
-        app:borderWidth="0dp"
-        android:backgroundTint="@color/white"
-        app:tint="@color/folder_color"
-        app:fabCustomSize="60dp"
-        app:maxImageSize="40dp"
         android:layout_height="wrap_content"
         android:layout_marginEnd="20dp"
-        app:srcCompat="@drawable/ic_play"
+        android:backgroundTint="@color/white"
+        app:borderWidth="0dp"
+        app:fabCustomSize="60dp"
         app:layout_anchor="@id/appBarLayout"
-        app:layout_anchorGravity="bottom|end"/>
+        app:layout_anchorGravity="bottom|end"
+        app:maxImageSize="40dp"
+        app:srcCompat="@drawable/ic_play"
+        app:tint="@color/folder_color" />
 
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

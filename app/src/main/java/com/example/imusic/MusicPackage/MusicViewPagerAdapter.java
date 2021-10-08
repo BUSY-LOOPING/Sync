@@ -22,7 +22,7 @@ public class MusicViewPagerAdapter extends FragmentStatePagerAdapter {
             case 1:
                 return new AlbumsFragment();
             case 2:
-                return new ServerFragment();
+                return new ArtistFragment();
         }
         return new SongsFragment();
     }
@@ -41,7 +41,7 @@ public class MusicViewPagerAdapter extends FragmentStatePagerAdapter {
             case 1:
                 return "Albums";
             case 2:
-                return "Server";
+                return "Artist";
         }
         return "Tracks";
     }

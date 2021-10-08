@@ -66,10 +66,10 @@ public class AlbumAdapterSection extends Section {
     @Override
     public void onBindHeaderViewHolder(RecyclerView.ViewHolder holder) {
         AlbumAdapterHeaderViewHolder headerViewHolder = (AlbumAdapterHeaderViewHolder) holder;
-        if (title.startsWith("<") || title.toLowerCase().startsWith("unknown")) {
-            title = "#";
-        }
-        headerViewHolder.txt.setText(title.substring(0 , 1));
+//        if (title.startsWith("<") || title.toLowerCase().startsWith("unknown")) {
+//            title = "#";
+//        }
+        headerViewHolder.txt.setText(title);
     }
 
     @Override

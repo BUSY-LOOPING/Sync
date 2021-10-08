@@ -1,5 +1,9 @@
 package com.example.imusic;
 
+import static com.example.imusic.VideoAdapter.VIDEO_FILES;
+import static com.example.imusic.VideoAdapter.VIDEO_FILES_POS;
+
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -118,8 +122,37 @@ public class PlaylistContentsActivity extends AppCompatActivity implements Playl
     }
 
     @Override
-    public void onClick() {
+    public void onClick(ArrayList<PlaylistFiles> playlistFiles, int pos) {
+        int newPos = -1;
+        if (playlistFiles.get(pos).isMusicFile) {
+            ArrayList<MusicFiles> musicFiles = new ArrayList<>();
+            for (int i = 0; i < playlistFiles.size(); i++) {
+                if (playlistFiles.get(i).isMusicFile) {
+                    musicFiles.add(playlistFiles.get(i).getMusicFiles());
+                    if (playlistFiles.get(i).getMusicFiles().getId().equals(playlistFiles.get(pos).getMusicFiles().getId())) {
+                        newPos = musicFiles.size() - 1;
+                    }
+                }
+            }
+            Intent intent = new Intent(this, PlayerActivity.class);
+            intent.putExtra("sender", "playlistAdapter");
+            intent.putExtra("listSongs", musicFiles);
+            intent.putExtra("position", newPos);
+            startActivity(intent);
+        } else if (playlistFiles.get(pos).isVideoFile) {
+            ArrayList<VideoFiles> videoFiles = new ArrayList<>();
+            for (int i = 0; i < playlistFiles.size(); i++) {
+                if (playlistFiles.get(i) != null && playlistFiles.get(i).isVideoFile)
+                    videoFiles.add(playlistFiles.get(i).getVideoFiles());
+                if (i == pos)
+                    newPos = videoFiles.size() - 1;
+            }
+            Intent intent = new Intent(this, VideoPlayerActivity.class);
 
+            intent.putExtra(VIDEO_FILES, videoFiles);
+            intent.putExtra(VIDEO_FILES_POS, newPos);
+            startActivity(intent);
+        }
     }
 
     @Override

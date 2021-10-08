@@ -6,6 +6,7 @@ import static com.example.imusic.MusicService.MUSIC_NOW_PLAYING;
 import static com.example.imusic.MusicService.PLAYING_FROM;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaMetadataRetriever;
 import android.os.Bundle;
@@ -18,6 +19,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
 
@@ -29,7 +31,7 @@ public class AlbumDetails extends AppCompatActivity {
     private ArrayList<MusicFiles> albumSongs = new ArrayList<>();
     public static AlbumDetailsAdapter albumDetailsAdapter;
     private Toolbar mToolbar;
-
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +41,7 @@ public class AlbumDetails extends AppCompatActivity {
         mToolbar = findViewById(R.id.album_details_album_name);
         recyclerView = findViewById(R.id.recyclerView_album_details);
         albumPhoto = findViewById(R.id.albumPhoto);
+        fab = findViewById(R.id.fab_activity_album_details);
 
         albumName = getIntent().getStringExtra("albumName");
         mToolbar.setTitle(albumName);
@@ -59,13 +62,21 @@ public class AlbumDetails extends AppCompatActivity {
                 }
             }
 
-            if (!(albumSongs.size() < 1)) {
-                albumDetailsAdapter = new AlbumDetailsAdapter(this, albumSongs);
+
+            albumDetailsAdapter = new AlbumDetailsAdapter(this, albumSongs);
 //                albumDetailsAdapter.setHasStableIds(true);
-                recyclerView.setHasFixedSize(false);
-                recyclerView.setAdapter(albumDetailsAdapter);
-                recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-            }
+            recyclerView.setHasFixedSize(false);
+            recyclerView.setAdapter(albumDetailsAdapter);
+            recyclerView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+
+            fab.setOnClickListener(v -> {
+                Intent intent = new Intent(this, PlayerActivity.class);
+                intent.putExtra("sender", "albumDetails");
+                albumDetailsAdapter.setPrev_played_id(albumSongs.get(0).getId());
+                albumDetailsAdapter.notifyItemChanged(0);
+                intent.putExtra("position", 0);
+                startActivity(intent);
+            });
 
             byte[] image = getAlbumArt(albumSongs.get(0).getPath());
             if (image != null) {

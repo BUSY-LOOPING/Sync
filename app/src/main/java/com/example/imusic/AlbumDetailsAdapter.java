@@ -25,6 +25,10 @@ public class AlbumDetailsAdapter extends RecyclerView.Adapter<AlbumDetailsAdapte
     public static ArrayList<MusicFiles> albumFiles;
     View view;
 
+    public void setPrev_played_id(String prev_played_id) {
+        this.prev_played_id = prev_played_id;
+    }
+
     public AlbumDetailsAdapter(Context mContext, ArrayList<MusicFiles> albumFiles) {
         this.mContext = mContext;
         AlbumDetailsAdapter.albumFiles = albumFiles;

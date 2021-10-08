@@ -15,21 +15,22 @@
         <item name="android:fontFamily">@font/helvetica</item>
         <item name="android:textColorPrimary">@color/colorAccent</item>
         <item name="android:textColorHint">#80FFFFFF</item>
-        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/color_primary</item>
+        <item name="android:navigationBarColor" tools:targetApi="lollipop">@color/color_primary
+        </item>
 
         <item name="popupMenuBackground">@drawable/my_popup_bg</item>
         <item name="windowActionModeOverlay">true</item>
         <item name="actionModeBackground">@color/color_primary</item>
 
-<!--        <item name="android:actionOverflowButtonStyle">@style/ActionButtonOverflow</item>-->
-<!--        <item name="actionOverflowButtonStyle">@style/ActionButtonOverflow</item>-->
+        <!--        <item name="android:actionOverflowButtonStyle">@style/ActionButtonOverflow</item>-->
+        <!--        <item name="actionOverflowButtonStyle">@style/ActionButtonOverflow</item>-->
 
     </style>
 
-<!--    <style name="ActionButtonOverflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">-->
-<!--        <item name="android:tint">@color/white</item>-->
-<!--        <item name="navigationIcon">@drawable/ic_cancel_2</item>-->
-<!--    </style>-->
+    <!--    <style name="ActionButtonOverflow" parent="@style/Widget.AppCompat.ActionButton.Overflow">-->
+    <!--        <item name="android:tint">@color/white</item>-->
+    <!--        <item name="navigationIcon">@drawable/ic_cancel_2</item>-->
+    <!--    </style>-->
 
 
     <!--    Bottom Sheet style-->
@@ -73,6 +74,14 @@
         <item name="android:windowAnimationStyle">@null</item>
     </style>
 
+    <style name="Theme.IMusic.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.IMusic.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.IMusic.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
 
 </resources>

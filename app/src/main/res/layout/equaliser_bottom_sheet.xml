@@ -409,59 +409,59 @@
 
             </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
 
-            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+<!--            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1">-->
 
-                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-                    android:id="@+id/bar11"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:progress="32"
-                    android:progressBackgroundTint="@color/white"
-                    android:progressTint="@color/tab_highlight"
-                    android:splitTrack="false"
-                    android:thumbTint="@color/tab_highlight"
-                    app:seekBarRotation="CW270" /> <!-- Rotation: CW90 or CW270 -->
+<!--                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar-->
+<!--                    android:id="@+id/bar11"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="0dp"-->
+<!--                    android:progress="32"-->
+<!--                    android:progressBackgroundTint="@color/white"-->
+<!--                    android:progressTint="@color/tab_highlight"-->
+<!--                    android:splitTrack="false"-->
+<!--                    android:thumbTint="@color/tab_highlight"-->
+<!--                    app:seekBarRotation="CW270" /> &lt;!&ndash; Rotation: CW90 or CW270 &ndash;&gt;-->
 
-            </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+<!--            </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>-->
 
-            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+<!--            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1">-->
 
-                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-                    android:id="@+id/bar12"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:progress="32"
-                    android:progressBackgroundTint="@color/white"
-                    android:progressTint="@color/tab_highlight"
-                    android:splitTrack="false"
-                    android:thumbTint="@color/tab_highlight"
-                    app:seekBarRotation="CW270" /> <!-- Rotation: CW90 or CW270 -->
+<!--                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar-->
+<!--                    android:id="@+id/bar12"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="0dp"-->
+<!--                    android:progress="32"-->
+<!--                    android:progressBackgroundTint="@color/white"-->
+<!--                    android:progressTint="@color/tab_highlight"-->
+<!--                    android:splitTrack="false"-->
+<!--                    android:thumbTint="@color/tab_highlight"-->
+<!--                    app:seekBarRotation="CW270" /> &lt;!&ndash; Rotation: CW90 or CW270 &ndash;&gt;-->
 
-            </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+<!--            </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>-->
 
-            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1">
+<!--            <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="match_parent"-->
+<!--                android:layout_weight="1">-->
 
-                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar
-                    android:id="@+id/bar13"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
-                    android:progress="32"
-                    android:progressBackgroundTint="@color/white"
-                    android:progressTint="@color/tab_highlight"
-                    android:splitTrack="false"
-                    android:thumbTint="@color/tab_highlight"
-                    app:seekBarRotation="CW270" /> <!-- Rotation: CW90 or CW270 -->
+<!--                <com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBar-->
+<!--                    android:id="@+id/bar13"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="0dp"-->
+<!--                    android:progress="32"-->
+<!--                    android:progressBackgroundTint="@color/white"-->
+<!--                    android:progressTint="@color/tab_highlight"-->
+<!--                    android:splitTrack="false"-->
+<!--                    android:thumbTint="@color/tab_highlight"-->
+<!--                    app:seekBarRotation="CW270" /> &lt;!&ndash; Rotation: CW90 or CW270 &ndash;&gt;-->
 
-            </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>
+<!--            </com.h6ah4i.android.widget.verticalseekbar.VerticalSeekBarWrapper>-->
 
 
         </LinearLayout>

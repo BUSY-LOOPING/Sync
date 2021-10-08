@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+    android:id="@+id/swipe_container_fragment_artist"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView_fragment_artist"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#111111" />
+
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

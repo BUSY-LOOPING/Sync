@@ -44,12 +44,16 @@ public class MiniPlayerRecyclerViewAdapter extends RecyclerView.Adapter<MiniPlay
     private RecyclerView recyclerView;
     private ImageView bg;
     private MusicFiles nowPlaying;
-    private static int prevPos = -1;
+    public static int prevPos = -1;
     private SharedPreferences preferences;
 
     private Bitmap bitmap = null;
     private LruCache<Long, Bitmap> mBitmapCache;
     private BitmapDrawable placeHolder;
+
+    public MusicFiles getNowPlaying() {
+        return nowPlaying;
+    }
 
     public MiniPlayerRecyclerViewAdapter(Context mContext, ArrayList<MusicFiles> musicFiles, RecyclerView recyclerView, ImageView bg) {
         this.mContext = mContext;

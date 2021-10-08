@@ -31,6 +31,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.view.ActionMode;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -58,7 +59,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
     private int prev_played_pos = -1;
     private ActionMode actionMode;
     private MenuItem browseParentMenuItem, setAsRingtoneMenuItem, infoMenuItem;
-    private boolean isSelected = false;
+    private boolean isSelected = false, showMoreBtn = true;
     private ArrayList<Integer> positions;
 
     private Bitmap bitmap = null;
@@ -103,11 +104,13 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
     @Override
     public void onViewDetachedFromWindow(@NonNull MyViewHolder holder) {
 //        holder.itemView.clearAnimation();
+        holder.menuMore.setVisibility(showMoreBtn ? View.VISIBLE : View.INVISIBLE);
     }
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolder holder, @SuppressLint("RecyclerView") int position) {
 //        setAnimation(holder.itemView, position);
+        holder.menuMore.setVisibility(showMoreBtn ? View.VISIBLE : View.INVISIBLE);
         if (holder.checkBox.getVisibility() == View.VISIBLE) {
             if (!isSelected || !selectedList.contains(mFiles.get(position))) {
                 clickItemWhenChecked(holder, position);
@@ -191,6 +194,13 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
                     ActionMode.Callback callback = new ActionMode.Callback() {
                         @Override
                         public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                            showMoreBtn = false;
+                            LinearLayoutManager llm = (LinearLayoutManager) recyclerView.getLayoutManager();
+                            if (llm != null) {
+                                for (int i = llm.findFirstVisibleItemPosition(); i <=  llm.findLastVisibleItemPosition(); i++) {
+                                    notifyItemChanged(i);
+                                }
+                            }
                             MusicAdapter.this.actionMode = mode;
                             mode.getMenuInflater().inflate(R.menu.contextual_menu_music_adapter, menu);
                             browseParentMenuItem = menu.findItem(R.id.browse_parent_contextual_menu_musicAdapter);
@@ -226,7 +236,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
                                 case R.id.add_to_playlist_contextual_menu_musicAdapter:
                                     AddToPlaylistPopup addToPlaylistPopup = new AddToPlaylistPopup();
                                     addToPlaylistPopup.setShowsDialog(true);
-                                    addToPlaylistPopup.show(((MainActivity)mContext).getSupportFragmentManager(), addToPlaylistPopup.getTag());
+                                    addToPlaylistPopup.show(((MainActivity) mContext).getSupportFragmentManager(), addToPlaylistPopup.getTag());
                                     addToPlaylistPopup.addMusicFiles(selectedList);
                                     break;
                                 case R.id.delete_contextual_menu_musicAdapter:
@@ -246,11 +256,18 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
 
                         @Override
                         public void onDestroyActionMode(ActionMode mode) {
+                            showMoreBtn = true;
                             isSelected = false;
                             selectedList.clear();
-                            for (int i = 0; i < positions.size(); i++) {
-                                notifyItemChanged(positions.get(i));
+                            LinearLayoutManager llm = (LinearLayoutManager) recyclerView.getLayoutManager();
+                            if (llm != null) {
+                                for (int i = llm.findFirstVisibleItemPosition(); i <=  llm.findLastVisibleItemPosition(); i++) {
+                                    notifyItemChanged(i);
+                                }
                             }
+                                    for (int i = 0; i < positions.size(); i++) {
+                                        notifyItemChanged(positions.get(i));
+                                    }
                             positions.clear();
                             actionMode = null;
                         }
@@ -312,10 +329,10 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MyViewHolder
             holder.checkBox.setVisibility(View.VISIBLE);
             holder.itemView.setBackgroundResource(R.color.ripple_color_light);
 //            if (holder.getAdapterPosition() >= 0) {
-                if (!selectedList.contains(mFiles.get(position))) {
-                    selectedList.add(mFiles.get(position));
-                    positions.add(position);
-                }
+            if (!selectedList.contains(mFiles.get(position))) {
+                selectedList.add(mFiles.get(position));
+                positions.add(position);
+            }
 //            }
         } else {
             holder.checkBox.setVisibility(View.GONE);

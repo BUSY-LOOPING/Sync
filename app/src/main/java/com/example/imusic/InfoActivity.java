@@ -94,12 +94,9 @@ public class InfoActivity extends AppCompatActivity {
                 if (codecInfo.isEncoder())
                 {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        codec.setText("Codec : " + codecInfo.getCanonicalName());
+                    } else
                         codec.setText("Codec : " + codecInfo.getName());
-                    }
-                    else
-                    {
-                        codec.setText("Codec : " + codecInfo.getName());
-                    }
                     break;
                 }
             }

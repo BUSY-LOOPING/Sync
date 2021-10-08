@@ -38,6 +38,7 @@
                 app:strokeWidth="0.5dp" />
 
             <Button
+                android:id="@+id/about_btn"
                 app:rippleColor="@color/ripple_color_light"
                 style="?attr/materialButtonOutlinedStyle"
                 android:layout_width="0dp"

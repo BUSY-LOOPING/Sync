@@ -17,7 +17,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -49,7 +48,7 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private int brightness;
+    //    private int brightness;
     public static final int REQUEST_CODE = 1;
     public static ArrayList<MusicFiles> musicFiles;
     static boolean shuffleBoolean = false, repeatBoolean = false;
@@ -88,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
 //        hasPermissions(this);
         permission();
         appInitialization();
+
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
 //            Set<String> set = MediaStore.getExternalVolumeNames(this);
 //            if (set != null && set.size() > 1)
@@ -360,11 +360,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        try {
-            brightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
-        } catch (Settings.SettingNotFoundException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            brightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+//        } catch (Settings.SettingNotFoundException e) {
+//            e.printStackTrace();
+//        }
         if (miniPlayer != null)
             miniPlayer.removeCallbacks();
     }
@@ -372,11 +372,11 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (brightness > 0 && Settings.System.canWrite(this)) {
-                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
-            }
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (brightness > 0 && Settings.System.canWrite(this)) {
+//                Settings.System.putInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS, brightness);
+//            }
+//        }
 
 
         SharedPreferences sharedPreferences = getSharedPreferences(MUSIC_NOW_PLAYING, MODE_PRIVATE);
@@ -420,17 +420,24 @@ public class MainActivity extends AppCompatActivity {
             if (miniPlayer.returnInstance().getState() == BottomSheetBehavior.STATE_COLLAPSED)
                 super.onBackPressed();
             else {
-                miniPlayer.reachedTop = true;
-                miniPlayer.returnInstance().setState(BottomSheetBehavior.STATE_COLLAPSED);
+                if (miniPlayer.searchViewEditText.hasFocus()) {
+                    miniPlayer.searchViewEditText.clearFocus();
+                } else {
+                    miniPlayer.reachedTop = true;
+                    miniPlayer.returnInstance().setState(BottomSheetBehavior.STATE_COLLAPSED);
+                }
             }
         }
     }
 
     @Override
     protected void onDestroy() {
-        Log.d("mytag", "ondestroy main activity called");
         super.onDestroy();
         miniPlayer.destroy();
+//        if (initiated && !playing) {
+//            NotificationManager notificationManager = (NotificationManager) this.getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+//            notificationManager.cancel(1);
+//        }
 //        SharedPreferences sharedPreferences = getSharedPreferences("demoteNotifyBar", MODE_PRIVATE);
 //        if (sharedPreferences.getBoolean("demoted", false)) {
 
@@ -438,5 +445,4 @@ public class MainActivity extends AppCompatActivity {
 //        getSupportFragmentManager().beginTransaction().remove(new AlbumsFragment()).commitAllowingStateLoss();
 
     }
-
 }

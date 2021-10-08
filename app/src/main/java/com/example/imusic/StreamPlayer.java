@@ -1,6 +1,15 @@
 package com.example.imusic;
 
+import static com.example.imusic.DataBaseHelperPlaylistNames.STREAM_DB_NAME;
+import static com.example.imusic.StreamActivity.list;
+import static com.example.imusic.StreamActivity.streamActivityAdapter;
+
+import android.app.PictureInPictureParams;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
+import android.util.Rational;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -12,34 +21,91 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView;
 
 public class StreamPlayer extends AppCompatActivity {
+    private PictureInPictureParams.Builder pictureInPictureParams;
     private YouTubePlayerView youTubePlayerView;
     private String videoId;
+    private Boolean mBackstackLost = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stream_player);
-        videoId = getIntent().getStringExtra("url_id");
+        init(getIntent());
+    }
+
+    private void init(Intent intent) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            pictureInPictureParams = new PictureInPictureParams.Builder();
+        }
+        videoId = intent.getStringExtra("url_id");
         if (videoId == null) {
             Toast.makeText(StreamPlayer.this, "Some error occurred. Try with some other link.", Toast.LENGTH_SHORT).show();
             finish();
         }
         youTubePlayerView = findViewById(R.id.youtube_player_view);
-        getLifecycle().addObserver(youTubePlayerView);
+//        getLifecycle().addObserver(youTubePlayerView);
 
         youTubePlayerView.addYouTubePlayerListener(new AbstractYouTubePlayerListener() {
             @Override
             public void onReady(@NonNull YouTubePlayer youTubePlayer) {
                 youTubePlayer.loadVideo(videoId, 0);
+                DataBaseStream db = new DataBaseStream(StreamPlayer.this, STREAM_DB_NAME, null, 1);
+                String original_url = intent.getStringExtra("original_url");
+                db.add(original_url);
+                list.add(original_url);
+                streamActivityAdapter.notifyItemInserted(0);
             }
 
             @Override
             public void onError(YouTubePlayer youTubePlayer, PlayerConstants.PlayerError error) {
-                super.onError(youTubePlayer, error);
                 Toast.makeText(StreamPlayer.this, "Some error occurred. Try with some other url.", Toast.LENGTH_SHORT).show();
                 finish();
             }
         });
-
     }
+
+    @Override
+    protected void onUserLeaveHint() {
+        super.onUserLeaveHint();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            if (!isInPictureInPictureMode()) {
+                pictureInPictureMode();
+            }
+        }
+    }
+
+    private void pictureInPictureMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            Rational aspectRation = new Rational(youTubePlayerView.getWidth(), youTubePlayerView.getHeight());
+            pictureInPictureParams.setAspectRatio(aspectRation).build();
+            enterPictureInPictureMode(pictureInPictureParams.build());
+        }
+    }
+
+    @Override
+    public void onPictureInPictureModeChanged(boolean isInPictureInPictureMode, Configuration newConfig) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig);
+        if (isInPictureInPictureMode) {
+            mBackstackLost = true;
+            if (youTubePlayerView != null && youTubePlayerView.getPlayerUiController().getMenu() != null) {
+                youTubePlayerView.getPlayerUiController().getMenu().dismiss();
+            }
+        }
+    }
+
+    @Override
+    public void finish() {
+        if( mBackstackLost ){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                finishAndRemoveTask();
+            }
+//            startActivity(
+//                    Intent.makeRestartActivityTask(
+//                            new ComponentName(this, MainActivity.class)));
+            startActivity(new Intent(this, MainActivity.class));
+        } else {
+            super.finish();
+        }
+    }
+
 }

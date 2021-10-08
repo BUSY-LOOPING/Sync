@@ -21,5 +21,6 @@
     <color name="item_color">#111111</color>
     <color name="bottomSheetColor">#333333</color>
     <color name="ripple_color">#5EA7E1</color>
+    <color name="ripple_color_mini_player">#30A3FF</color>
     <color name="ripple_color_light">#5C5EA7E1</color>
 </resources>

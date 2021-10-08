@@ -9,11 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.imusic.AlbumAdapterSection;
+import com.example.imusic.ApplicationClass;
+import com.example.imusic.MainActivity;
 import com.example.imusic.MusicFiles;
 import com.example.imusic.R;
 
@@ -28,6 +31,7 @@ public class AlbumsFragment extends Fragment {
     private ArrayList<MusicFiles> albums = new ArrayList<>();
     private Context context;
     private ArrayList<String> list = new ArrayList<>();
+    private ApplicationClass ref;
 
     public AlbumsFragment() {
 
@@ -37,6 +41,12 @@ public class AlbumsFragment extends Fragment {
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        ref = (ApplicationClass) ((MainActivity)context).getApplication();
     }
 
     @Override
@@ -67,6 +77,7 @@ public class AlbumsFragment extends Fragment {
 //        if (!(albums.size() < 1)) {
         list = getList();
         SectionedRecyclerViewAdapter sectionedRecyclerViewAdapter = new SectionedRecyclerViewAdapter();
+        ref.setSectionedRecyclerViewAdapter(sectionedRecyclerViewAdapter);
         for (int i = 0; i < list.size() ; i ++) {
             sectionedRecyclerViewAdapter.addSection(new AlbumAdapterSection(context, list.get(i), getAlbumsBeginningWith(list.get(i).substring(0 , 1))));
         }

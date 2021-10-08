@@ -5,13 +5,13 @@
         android:id="@+id/play_contextual_menu_videoAdapter"
         android:icon="@drawable/exo_icon_play"
         android:iconTint="@color/white"
-        android:title=""
+        android:title="Play"
         app:showAsAction="ifRoom" />
+
     <item
         android:id="@+id/append_contextual_menu_videoAdapter"
-        android:icon="@drawable/ic_baseline_playlist_add_24"
-        android:iconTint="@color/white"
-        android:title=""
+        android:actionLayout="@layout/play_with_append_custom_layout"
+        android:title="Append"
         app:showAsAction="ifRoom" />
 
     <item

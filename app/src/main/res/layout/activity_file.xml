@@ -35,14 +35,20 @@
 
         </HorizontalScrollView>
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:layoutAnimation="@anim/layout_animation"
-            android:id="@+id/recyclerView_activity_file"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/hor_scroll_view"
-            android:layout_marginTop="10dp" />
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+            android:id="@+id/swipe_container_activity_file"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/hor_scroll_view">
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerView_activity_file"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="10dp"
+                android:layoutAnimation="@anim/layout_animation" />
+
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
     </RelativeLayout>
 
     <com.google.android.material.appbar.AppBarLayout

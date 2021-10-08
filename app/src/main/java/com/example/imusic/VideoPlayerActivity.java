@@ -8,12 +8,14 @@ import static com.example.imusic.fragment.MoreFragment.historyAdapter;
 
 import android.animation.ObjectAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.PictureInPictureParams;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Point;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.AnimatedVectorDrawable;
 import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
@@ -40,10 +42,16 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.mediarouter.app.MediaRouteButton;
 import androidx.vectordrawable.graphics.drawable.AnimatedVectorDrawableCompat;
 
 import com.google.android.exoplayer2.MediaItem;
@@ -51,11 +59,21 @@ import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.ui.PlayerView;
+import com.google.android.gms.cast.MediaInfo;
+import com.google.android.gms.cast.MediaMetadata;
+import com.google.android.gms.cast.framework.CastButtonFactory;
+import com.google.android.gms.cast.framework.CastContext;
+import com.google.android.gms.cast.framework.CastSession;
+import com.google.android.gms.cast.framework.CastStateListener;
+import com.google.android.gms.cast.framework.SessionManagerListener;
+import com.google.android.gms.cast.framework.media.RemoteMediaClient;
+import com.google.android.gms.cast.framework.media.widget.ExpandedControllerActivity;
 
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
 
 public class VideoPlayerActivity extends AppCompatActivity implements View.OnClickListener {
-    private TextView video_title, total_duration, current_time, brightness_txt, volume_txt;
+    private TextView video_title, total_duration, current_time, brightness_txt, volume_txt, seek_secs, seek_current_time;
     private ImageView back, play_pause_btn, unlock_btn, lock_btn, nextBtn, prevBtn, brightness_icon, volume_icon;
     private ArrayList<VideoFiles> currentVideo;
     private int position;
@@ -63,6 +81,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     private ProgressBar progressBar, brightnessProgressBar, volumeProgressBar;
     private View decorView;
     private SeekBar seekBar;
+    private boolean changingSeekBar = false;
 
     public enum ControlsMode {
         LOCK, FULLCONTROLS
@@ -97,14 +116,14 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
     private Window window;
     private Display display;
     private Point size;
-    private float brightness;
+    private float brightness, seekSpeed = 1;
     private int sWidth, sHeight, mediaVolume;
     private SimpleExoPlayer simpleExoPlayer;
     private PlayerView playerView;
-    private LinearLayout root, unlockPanel, controlsLinearLayout, brightnessBarContainer, brightnessCenterText, volumeBarContainer, volumeCenterText;
+    private LinearLayout root, unlockPanel, controlsLinearLayout, topControls, brightnessBarContainer, volumeBarContainer, cast_container, seekBarCenterTxtContainer;
     private long totalDuration, diffX, diffY;
     float baseX, baseY;
-    private boolean isStopped = false, intLeft, intRight, intBottom, intTop, screen_swipe_move, tested_ok, mBackstackLost = false;
+    private boolean isStopped = false, intLeft, intRight, intBottom, intTop, screen_swipe_move, tested_ok, mBackstackLost = false, left_to_right = false;
     private int initialSystemUiVisibility;
     int uiImmersiveOptions = (
             View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
@@ -115,16 +134,154 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                     View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
                     View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
-    private static final int MAX_CLICK_DURATION = 200;
+    private static final int MAX_CLICK_DURATION = 200, MIN_DISTANCE = 10;
+    private int calculatedTime = 0;
     private long startClickTime;
 
     //Implementing chromecast
-//    private MediaRouteButton mediaRouteButton;
-//    private CastContext castContext;
-//    private CastSession castSession;
-//    private PlaybackState playbackState;
+    private CastContext castContext;
+    private MediaRouteButton mediaRouteButton;
+    //    private CastContext castContext;
+    private CastSession castSession;
+    //    private PlaybackState playbackState;
 //    private SessionManager sessionManager;
-    MediaItem mediaItem;
+    private final SessionManagerListener<CastSession> sessionSessionManagerListener = new SessionManagerListenerImpl();
+
+    private class SessionManagerListenerImpl implements SessionManagerListener<CastSession> {
+        @Override
+        public void onSessionStarting(@NonNull CastSession castSession) {
+            Toast.makeText(VideoPlayerActivity.this, "onSessionStarting", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onSessionStarted(@NonNull CastSession castSession, @NonNull String s) {
+            //when tv and chromecast both are connected
+            onApplicationConnected(castSession);
+            Toast.makeText(VideoPlayerActivity.this, "onSessionStarted", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        public void onSessionStartFailed(@NonNull CastSession castSession, int i) {
+
+        }
+
+        @Override
+        public void onSessionEnding(@NonNull CastSession castSession) {
+
+        }
+
+        @Override
+        public void onSessionEnded(@NonNull CastSession castSession, int i) {
+
+        }
+
+        @Override
+        public void onSessionResuming(@NonNull CastSession castSession, @NonNull String s) {
+
+        }
+
+        @Override
+        public void onSessionResumed(@NonNull CastSession castSession, boolean b) {
+            //re connected or re resumed
+            onApplicationConnected(castSession);
+        }
+
+        @Override
+        public void onSessionResumeFailed(@NonNull CastSession castSession, int i) {
+
+        }
+
+        @Override
+        public void onSessionSuspended(@NonNull CastSession castSession, int i) {
+
+        }
+    }
+
+    private ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult result) {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        // There are no request codes
+//                        Intent data = result.getData();
+//                        doSomeOperations();
+                    }
+                }
+            });
+
+    public void openActivityForResult() {
+        Intent intent = new Intent(this, ExpandedControllerActivity.class);
+        activityResultLauncher.launch(intent);
+    }
+
+    private void onApplicationConnected(CastSession castSession) {
+        this.castSession = castSession;
+        loadMedia(0, true);
+    }
+
+    private void loadMedia(int position, boolean autoPlay) {
+        if (castSession == null) {
+            return;
+        }
+
+        final RemoteMediaClient remoteMediaClient = castSession.getRemoteMediaClient();
+        if (remoteMediaClient == null) {
+            return;
+        }
+        remoteMediaClient.addListener(new RemoteMediaClient.Listener() {
+            @Override
+            public void onStatusUpdated() {
+                Intent intent = new Intent(VideoPlayerActivity.this, ExpandedControllerActivity.class);
+                startActivity(intent);
+                remoteMediaClient.removeListener(this);
+                if (simpleExoPlayer.isPlaying()) {
+                    simpleExoPlayer.pause();
+                    anim_PauseToPlay();
+                }
+            }
+
+            @Override
+            public void onMetadataUpdated() {
+
+            }
+
+            @Override
+            public void onQueueStatusUpdated() {
+
+            }
+
+            @Override
+            public void onPreloadStatusUpdated() {
+
+            }
+
+            @Override
+            public void onSendingRemoteMediaRequest() {
+
+            }
+
+            @Override
+            public void onAdBreakStatusUpdated() {
+
+            }
+        });
+        remoteMediaClient.load(buildMediaInfo(remoteMediaClient), autoPlay, position);
+    }
+
+    private MediaInfo buildMediaInfo(RemoteMediaClient remoteMediaClient) {
+        MediaMetadata mediaMetadata = new MediaMetadata(MediaMetadata.MEDIA_TYPE_MOVIE);
+        mediaMetadata.putString(MediaMetadata.KEY_TITLE, currentVideo.get(position).getTitle());
+
+        return new MediaInfo.Builder(currentVideo.get(position).getPath())
+                .setContentUrl(currentVideo.get(position).getPath())
+                .setStreamType(MediaInfo.STREAM_TYPE_BUFFERED)
+                .setContentType("videos/mp4")
+                .setMetadata(mediaMetadata)
+                .setStreamDuration(totalDuration)
+                .build();
+    }
+
+    private MediaItem mediaItem;
 
 
     @Override
@@ -145,16 +302,23 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         VideoPlayerActivity.this.runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (isStopped) handler.removeCallbacks(this);
-                seekBar.setProgress((int) (simpleExoPlayer.getCurrentPosition()));
-                current_time.setText(milliSecondsToTimer(simpleExoPlayer.getCurrentPosition()));
-                handler.post(this);
+                if (!tested_ok) {
+                    if (isStopped) handler.removeCallbacks(this);
+                    seekBar.setProgress((int) (simpleExoPlayer.getCurrentPosition()));
+                    current_time.setText(milliSecondsToTimer(simpleExoPlayer.getCurrentPosition()));
+                    handler.post(this);
+                }
             }
         });
         seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 if (fromUser) {
+                    changingSeekBar = true;
+                    showAllControls();
+                    seekBarCenterTxtContainer.setVisibility(View.VISIBLE);
+                    seek_secs.setVisibility(View.GONE);
+                    seek_current_time.setText(milliSecondsToTimer(progress));
                     simpleExoPlayer.seekTo(progress);
 //                    showAllControls();
                 }
@@ -167,7 +331,8 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                hideViewWithAnim(seekBarCenterTxtContainer, 1000);
+                changingSeekBar = false;
             }
         });
     }
@@ -305,14 +470,14 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                     finish();
                 }
                 if (playbackState == Player.STATE_BUFFERING) {
-                    progressBar.setVisibility(View.VISIBLE);
+                    if (!tested_ok)
+                        progressBar.setVisibility(View.VISIBLE);
                 }
                 if (playbackState == Player.STATE_READY) {
                     progressBar.setVisibility(View.GONE);
                     totalDuration = simpleExoPlayer.getDuration();
                     seekBar.setMax((int) totalDuration);
                     setMediaData();
-
                 }
                 // STATE_IDLE, STATE_ENDED
                 // This prevents the screen from getting dim/lock
@@ -350,12 +515,32 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         root = findViewById(R.id.root);
         controlsLinearLayout = findViewById(R.id.controls);
         brightnessBarContainer = findViewById(R.id.brightness_slider_container);
-        brightnessCenterText = findViewById(R.id.brightness_center_text);
+        topControls = findViewById(R.id.top_video_player_activity);
+        cast_container = findViewById(R.id.chrome_cast_container);
+        mediaRouteButton = new MediaRouteButton(this);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mediaRouteButton.setBackgroundTintMode(PorterDuff.Mode.MULTIPLY);
+            mediaRouteButton.setBackgroundTintList(ContextCompat.getColorStateList(this, R.color.white));
+        }
+        cast_container.addView(mediaRouteButton);
+        CastButtonFactory.setUpMediaRouteButton(getApplicationContext(), mediaRouteButton);
+        castContext = CastContext.getSharedInstance(this);
+        castContext.addCastStateListener(new CastStateListener() {
+            @Override
+            public void onCastStateChanged(int i) {
+                Toast.makeText(VideoPlayerActivity.this, "onCastStateChanged", Toast.LENGTH_SHORT).show();
+            }
+        });
+        castContext.getSessionManager().addSessionManagerListener(sessionSessionManagerListener, CastSession.class);
+//        brightnessCenterText = findViewById(R.id.brightness_center_text);
         volumeBarContainer = findViewById(R.id.volume_slider_container);
-        volumeCenterText = findViewById(R.id.volume_center_text);
+        seekBarCenterTxtContainer = findViewById(R.id.seekbar_center_text);
+//        volumeCenterText = findViewById(R.id.volume_center_text);
 
         brightness_txt = findViewById(R.id.brightness_percent_txt);
         volume_txt = findViewById(R.id.volume_percent_txt);
+        seek_secs = findViewById(R.id.txt_seek_secs);
+        seek_current_time = findViewById(R.id.txt_seek_currTime);
         brightnessProgressBar = findViewById(R.id.brightness_slider);
         volumeProgressBar = findViewById(R.id.volume_slider);
         unlockPanel = findViewById(R.id.unlock_panel);
@@ -610,7 +795,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
         return super.onTouchEvent(event);
     }
 
-    @SuppressLint("SetTextI18n")
+    @SuppressLint({"SetTextI18n", "DefaultLocale"})
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         int x = (int) (ev.getX());
@@ -630,18 +815,18 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
 //            diffX = 0;
 //            diffY = 0;
         }
-//            int upperLimit = (sHeight / 4) + 100;
-//            int lowerLimit = ((sHeight / 4) * 3) - 150;
-//            if (y < upperLimit) {
-//                intBottom = false;
-//                intTop = true;
-//            } else if (y > lowerLimit) {
-//                intBottom = true;
-//                intTop = false;
-//            } else {
-//                intBottom = false;
-//                intTop = false;
-//            }
+        int upperLimit = (sHeight / 4) + 100;
+        int lowerLimit = ((sHeight / 4) * 3) - 150;
+        if (y < upperLimit) {
+            intBottom = false;
+            intTop = true;
+        } else if (y > lowerLimit) {
+            intBottom = true;
+            intTop = false;
+        } else {
+            intBottom = false;
+            intTop = false;
+        }
 
 
         // TOUCH STARTED
@@ -649,12 +834,14 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             long clickDuration = System.currentTimeMillis() - startClickTime;
             if (clickDuration > MAX_CLICK_DURATION) {
                 screen_swipe_move = true;
+                diffX = (long) (Math.ceil(ev.getX() - baseX));
+                diffY = (long) (Math.ceil(ev.getY() - baseY));
+//                if (Math.abs(diffY) > MIN_DISTANCE) {
+//                    tested_ok = true;
+//                }
                 if (controlsState == ControlsMode.FULLCONTROLS) {
-//                root.setVisibility(View.GONE);
-                    diffX = (long) (Math.ceil(ev.getX() - baseX));
-                    diffY = (long) (Math.ceil(ev.getY() - baseY));
                     double brightnessSpeed = 0.08;
-                    if (Math.abs(diffY) > Math.abs(diffX)) { //checking vertical swipe
+                    if (Math.abs(diffY) > Math.abs(diffX) && !tested_ok && !changingSeekBar) { //checking vertical swipe
 
                         if (intLeft) {  //checking vertical swipe in left corner
                             cResolver = getContentResolver();
@@ -717,16 +904,73 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
                             volume_txt.setText((String.valueOf(volPer)).replace(".0", "") + "%");
 
                         }
-                    } else {
+                    } else if (Math.abs(diffX) > Math.abs(diffY)) {
+                        int[] arr = new int[2];
+                        total_duration.getLocationOnScreen(arr);
+                        if (Math.abs(diffX) > (MIN_DISTANCE + 100) && ev.getY() < arr[1]) {
+                            tested_ok = true;
+                            root.setVisibility(View.VISIBLE);
+                            seekBarCenterTxtContainer.setVisibility(View.VISIBLE);
+                            seek_secs.setVisibility(View.VISIBLE);
+                            topControls.setVisibility(View.GONE);
+                            controlsLinearLayout.setVisibility(View.INVISIBLE);
+                            seekBar.setVisibility(View.VISIBLE);
+                            String toTime = "";
+                            int newCalculatedTime = (int) ((diffX) * seekSpeed);
+                            if (newCalculatedTime < calculatedTime && newCalculatedTime >= 0)
+                                seekSpeed--;
+                            else
+                                seekSpeed++;
+                            calculatedTime = newCalculatedTime;
 
+
+//                            seekSpeed++;
+                            String seekDur = "";
+                            long pos = simpleExoPlayer.getCurrentPosition();
+                            pos = pos + calculatedTime;
+                            if (pos < 0) {
+                                pos = 0;
+                                calculatedTime = -(int) simpleExoPlayer.getCurrentPosition();
+                            }
+                            if (pos > totalDuration) {
+                                pos = totalDuration;
+                                calculatedTime = (int) totalDuration;
+                            }
+                            if (calculatedTime > 0) {
+                                seekDur = String.format("[+%02d:%02d]",
+                                        TimeUnit.MILLISECONDS.toMinutes(calculatedTime) -
+                                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(calculatedTime)),
+                                        TimeUnit.MILLISECONDS.toSeconds(calculatedTime) -
+                                                TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(calculatedTime)));
+                            } else if (calculatedTime < 0) {
+                                seekDur = String.format("[-%02d:%02d]",
+                                        TimeUnit.MILLISECONDS.toMinutes(calculatedTime) -
+                                                TimeUnit.HOURS.toMinutes(TimeUnit.MILLISECONDS.toHours(calculatedTime)),
+                                        TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(calculatedTime)) -
+                                                TimeUnit.MILLISECONDS.toSeconds(calculatedTime));
+                            }
+                            seek_secs.setText(seekDur);
+                            toTime = milliSecondsToTimer(pos);
+                            seek_current_time.setText(toTime);
+                            seekBar.setProgress((int) pos);
+                        }
                     }
-
                 }
             }
         }
 
         if (ev.getAction() == MotionEvent.ACTION_UP) {
             long clickDuration = System.currentTimeMillis() - startClickTime;
+            if (tested_ok) {
+                simpleExoPlayer.seekTo(simpleExoPlayer.getCurrentPosition() + calculatedTime);
+                showAllControls();
+                topControls.setVisibility(View.VISIBLE);
+                controlsLinearLayout.setVisibility(View.VISIBLE);
+                hideViewWithAnim(seekBarCenterTxtContainer, 1000);
+                tested_ok = false;
+                seekSpeed = 1;
+                calculatedTime = 0;
+            }
             if (clickDuration < MAX_CLICK_DURATION) {
                 screen_swipe_move = false;
                 tested_ok = false;
@@ -754,6 +998,16 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             }
         }
         return super.dispatchTouchEvent(ev);
+    }
+
+    private void hideViewWithAnim(LinearLayout linearLayout, int dur) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            Transition transition = new Fade();
+            transition.setDuration(dur);
+            transition.addTarget(linearLayout);
+            TransitionManager.beginDelayedTransition((ViewGroup) linearLayout.getRootView(), transition);
+        }
+        linearLayout.setVisibility(View.GONE);
     }
 
     private void prevBtnClicked() {
@@ -804,8 +1058,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
             hideAllControls();
             hideBrightnessBar();
             hideVolumeBar();
-        }
-        else {
+        } else {
 //            getActionBar().show();
 //            showAllControls();
 
@@ -823,7 +1076,7 @@ public class VideoPlayerActivity extends AppCompatActivity implements View.OnCli
 
     @Override
     public void finish() {
-        if( mBackstackLost ){
+        if (mBackstackLost) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 finishAndRemoveTask();
             }

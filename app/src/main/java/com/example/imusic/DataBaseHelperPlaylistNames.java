@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 
 public class DataBaseHelperPlaylistNames extends SQLiteOpenHelper {
     private final String TABLE_NAME = "PlaylistNames";
+    public static final String STREAM_DB_NAME = "stream.db";
 
     public DataBaseHelperPlaylistNames(@Nullable Context context, @Nullable String name, @Nullable SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);

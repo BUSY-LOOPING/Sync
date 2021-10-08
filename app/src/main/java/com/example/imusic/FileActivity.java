@@ -3,7 +3,9 @@ package com.example.imusic;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,29 +19,32 @@ import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.example.imusic.fragment.BrowseFragment;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 
-public class FileActivity extends AppCompatActivity implements OnClickListenerActivityFileAdapter, SearchView.OnQueryTextListener {
+public class FileActivity extends AppCompatActivity implements OnClickListenerActivityFileAdapter, SearchView.OnQueryTextListener, SwipeRefreshLayout.OnRefreshListener {
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private SwipeRefreshLayout.OnRefreshListener onRefreshListener;
+    private boolean show_all_files = true, show_hidden_files = true;
     public static final String PARENT = "file_parent";
-    File parent;
+    private File parent;
     boolean isFav = false;
     public static final String IS_FAV = "IS_FAVOURITE";
     public static final String STRING_FAV = "STRING_FAV";
     private DataBaseHelper mydb;
     private List<File> list = new ArrayList<>();
     private ArrayList<Integer> pairList;
-    private Map<Integer, File> map = new HashMap<>();;
+    private Handler handler = new Handler();
     private String sortOrder_name = "ASC";
     private String sortOrder_size = "ASC";
 
@@ -57,6 +62,7 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
         if (mydb.isFavourite(parent)) {
             menu.findItem(R.id.fav_icon_file_menu).setIcon(R.drawable.ic_baseline_star_rate).setChecked(true);
         }
+
         MenuItem menuItem = menu.findItem(R.id.search_file_menu);
         SearchView searchView = (SearchView) menuItem.getActionView();
         searchView.setQueryHint("Search in current list");
@@ -94,7 +100,6 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
                     item.setIcon(R.drawable.ic_baseline_star_border);
                     isFav = false;
                     mydb.deleteData(parent.getAbsolutePath());
-                    Toast.makeText(this, "Removed", Toast.LENGTH_SHORT).show();
                     BrowseFragment.browseAdapter.removeFile(parent);
                 } else {
                     item.setChecked(true);
@@ -109,7 +114,7 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
 
                 Collections.sort(list, new MySortByName_FileActivity(sortOrder_name));
                 sort_no_media(list, pairList);
-                activityFileAdapter.update(list, pairList,recyclerView);
+                activityFileAdapter.update(list, pairList, recyclerView);
                 if (sortOrder_name.equals("ASC"))
                     sortOrder_name = "DES";
                 else
@@ -119,7 +124,7 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
             case R.id.sort_by_size_file_menu:
                 Collections.sort(list, new MySortBySize_FileActivity(sortOrder_size));
                 sort_no_media(list, pairList);
-                activityFileAdapter.update(list,pairList ,recyclerView);
+                activityFileAdapter.update(list, pairList, recyclerView);
                 if (sortOrder_size.equals("ASC"))
                     sortOrder_size = "DES";
                 else
@@ -128,9 +133,25 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
 
             case R.id.show_all_files:
                 item.setChecked(!item.isChecked());
+                if (item.isChecked()) {
+                    show_all_files = true;
+                    ShowAllFiles showAllFiles = new ShowAllFiles();
+                    showAllFiles.execute("start");
+                } else {
+                    show_all_files = false;
+                    ShowOnlyMediaFiles showOnlyMediaFiles = new ShowOnlyMediaFiles();
+                    showOnlyMediaFiles.execute("start");
+                }
                 break;
             case R.id.show_hidden_files:
                 item.setChecked(!item.isChecked());
+                if (item.isChecked()) {
+                    show_hidden_files = true;
+                } else {
+                    show_hidden_files = false;
+                    ShowNonHiddenFiles showNonHiddenFiles = new ShowNonHiddenFiles();
+                    showNonHiddenFiles.execute("start");
+                }
                 break;
             case R.id.add_this_folder_n_subfoldes:
                 Bundle bundle = new Bundle();
@@ -140,28 +161,14 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
                 popup.setShowsDialog(true);
                 popup.show(getSupportFragmentManager(), popup.getTag());
                 break;
+            case R.id.refresh_file_menu:
+                swipeRefreshLayout.setRefreshing(true);
+                onRefreshListener.onRefresh();
         }
         return true;
     }
 
     private void sort_no_media(List<File> key, ArrayList<Integer> tempList) {
-        for (int i = 0; i < tempList.size(); i++) {
-            if (tempList.get(i) == null){
-                Log.d("mylog", "null");
-            } else {
-                Log.d("mylog", "" + tempList.get(i));
-            }
-        }
-
-
-        Log.d("mylog", "after sort");
-        for (int i = 0; i < tempList.size(); i++) {
-            if (tempList.get(i) == null){
-                Log.d("mylog", "null");
-            } else {
-                Log.d("mylog", "" + tempList.get(i));
-            }
-        }
 
     }
 
@@ -178,22 +185,28 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
         if (!parent.exists()) {
             Toast.makeText(this, "Cannot open the file location " + parent.getPath() + " .It no longer exists.", Toast.LENGTH_SHORT).show();
         }
+
         mydb = new DataBaseHelper(this, "favourite.db", null, 1);
         pairList = new ArrayList<>();
-        File[] tempFiles = parent.listFiles();
-        if (tempFiles != null) {
-            list = Arrays.asList(tempFiles);
-            for (int i = 0; i < list.size(); i++) {
-                File[] array = list.get(i).listFiles();
-                if (array != null) {
-                    pairList.add(array.length);
-                } else {
-                    pairList.add(0);
-                }
-            }
-        } else pairList.add(0);
+//        File[] tempFiles = parent.listFiles();
+//        if (tempFiles != null) {
+//            list = Arrays.asList(tempFiles);
+//            for (int i = 0; i < list.size(); i++) {
+//                File[] array = list.get(i).listFiles();
+//                if (array != null) {
+//                    pairList.add(array.length);
+//                } else {
+//                    pairList.add(0);
+//                }
+//            }
+//        } else pairList.add(0);
 
-
+        swipeRefreshLayout = findViewById(R.id.swipe_container_activity_file);
+        ShowAllFiles showAllFiles = new ShowAllFiles();
+        showAllFiles.execute("start");
+        swipeRefreshLayout.setColorSchemeResources(R.color.tab_highlight, R.color.white);
+        onRefreshListener = this;
+        swipeRefreshLayout.setOnRefreshListener(onRefreshListener);
         Toolbar toolbar = findViewById(R.id.toolbar_activity_file);
         toolbar.setTitle(parent.getName().equals("sdcard") | parent.getName().equals("0") ? "Internal memory" : parent.getName());
         TextView path_parent = findViewById(R.id.path_parent);
@@ -268,17 +281,6 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
         String userInput = newText.toLowerCase();
         List<File> temp = new ArrayList<>();
         ArrayList<Integer> tempPairList = new ArrayList<>();
-//        if (tempFiles != null) {
-//            list = Arrays.asList(tempFiles);
-//            for (int i = 0; i < list.size(); i++) {
-//                File[] array = list.get(i).listFiles();
-//                if (array != null) {
-//                    pairList.add(array.length);
-//                } else {
-//                    pairList.add(0);
-//                }
-//            }
-//        } else pairList.add(0);
         for (int i = 0; i < list.size(); i++) {
             if (list.get(i).getName().toLowerCase().contains(userInput)) {
                 temp.add(list.get(i));
@@ -287,5 +289,169 @@ public class FileActivity extends AppCompatActivity implements OnClickListenerAc
         }
         activityFileAdapter.update(temp, tempPairList, recyclerView);
         return true;
+    }
+
+    @Override
+    public void onRefresh() {
+        if (show_all_files && show_hidden_files) {
+            ShowAllFiles showAllFiles = new ShowAllFiles();
+            showAllFiles.execute("start");
+        } else if (!show_hidden_files && !show_all_files) {
+            ShowNonHiddenFiles showNonHiddenFiles = new ShowNonHiddenFiles();
+            showNonHiddenFiles.execute("start");
+        } else if (show_all_files && !show_hidden_files) {
+            ShowNonHiddenFiles showNonHiddenFiles = new ShowNonHiddenFiles();
+            showNonHiddenFiles.execute("start");
+        } else if (!show_all_files && show_hidden_files) {
+            ShowOnlyMediaFiles showOnlyMediaFiles = new ShowOnlyMediaFiles();
+            showOnlyMediaFiles.execute("start");
+        }
+    }
+
+    private class ShowNonHiddenFiles extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            FileFilter fileFilter = new FileFilter() {
+                @Override
+                public boolean accept(File file) {
+                    if (!show_all_files) {
+                        return ((file.isDirectory()
+                                || ActivityFileAdapter.isMusicFile(file.getAbsolutePath())
+                                || ActivityFileAdapter.isVideoFile(file.getAbsolutePath())) && !file.isHidden());
+                    }
+                    return !file.isHidden();
+                }
+            };
+            File[] fileArray;
+            fileArray = parent.listFiles(fileFilter);
+            list.clear();
+            if (fileArray != null) {
+                list = new ArrayList<>(Arrays.asList(fileArray));
+                for (int i = 0; i < list.size(); i++) {
+                    File[] array = list.get(i).listFiles();
+                    if (array != null) {
+                        pairList.add(array.length);
+                    } else {
+                        pairList.add(0);
+                    }
+                }
+            } else
+                pairList.add(0);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }, 500);
+            activityFileAdapter.update(list, pairList, recyclerView);
+        }
+    }
+
+    private class ShowAllFiles extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            File[] fileArray;
+//            if (!show_hidden_files) {
+//                FileFilter fileFilter = new FileFilter() {
+//                    @Override
+//                    public boolean accept(File file) {
+//                        return !file.isHidden();
+//                    }
+//                };
+//                fileArray = parent.listFiles(fileFilter);
+//            } else
+                fileArray = parent.listFiles();
+            list.clear();
+            if (fileArray != null) {
+                list = new ArrayList<>(Arrays.asList(fileArray));
+                for (int i = 0; i < list.size(); i++) {
+                    File[] array = list.get(i).listFiles();
+                    if (array != null) {
+                        pairList.add(array.length);
+                    } else {
+                        pairList.add(0);
+                    }
+                }
+            } else
+                pairList.add(0);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }, 500);
+            activityFileAdapter.update(list, pairList, recyclerView);
+        }
+    }
+
+    private class ShowOnlyMediaFiles extends AsyncTask<String, String, String> {
+        @Override
+        protected void onPreExecute() {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            File[] fileArray;
+            fileArray = parent.listFiles();
+            list.clear();
+
+            if (fileArray != null) {
+                for (File file : fileArray) {
+                    if (file.isDirectory()
+                            || ActivityFileAdapter.isMusicFile(file.getAbsolutePath())
+                            || ActivityFileAdapter.isVideoFile(file.getAbsolutePath())
+                    ) {
+                        list.add(file);
+                        Log.d("mylog", "doInBackground: " + file.getName());
+                    }
+                }
+
+                for (int i = 0; i < list.size(); i++) {
+                    File[] array = list.get(i).listFiles();
+                    if (array != null) {
+                        pairList.add(array.length);
+                    } else {
+                        pairList.add(0);
+                    }
+                }
+            } else
+                pairList.add(0);
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    swipeRefreshLayout.setRefreshing(false);
+                }
+            }, 500);
+            activityFileAdapter.update(list, pairList, recyclerView);
+        }
     }
 }
