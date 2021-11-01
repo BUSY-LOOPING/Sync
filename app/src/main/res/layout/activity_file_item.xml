@@ -52,6 +52,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Empty"
+            android:maxLines="1"
+            android:ellipsize="end"
             android:textColor="#C5B7B7"
             android:textSize="15sp" />
     </LinearLayout>
@@ -69,7 +71,8 @@
             android:id="@+id/more_file_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:srcCompat="@drawable/ic_baseline_more" />
+            app:srcCompat="@drawable/ic_baseline_more"
+            android:background="?attr/selectableItemBackgroundBorderless"/>
 
     </LinearLayout>
 

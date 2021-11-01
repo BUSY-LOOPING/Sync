@@ -10,7 +10,7 @@
         android:layout_height="match_parent"
         android:background="#111111"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior"
-        tools:context=".FileActivity">
+        tools:context="com.sync.imusic.FileActivity">
 
         <HorizontalScrollView
             android:id="@+id/hor_scroll_view"

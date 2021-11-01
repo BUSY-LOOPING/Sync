@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:icon="@drawable/pip"
+        android:id="@+id/pop_out"
+        android:title="    Pop out" />
+
+    <item
+        android:icon="@drawable/save_playlist"
+        android:id="@+id/save_playlist"
+        android:title="    Save playlist" />
+
+    <item
+        android:icon="@drawable/scale"
+        android:id="@+id/aspect_ratio"
+        android:title="" />
+
+</menu>

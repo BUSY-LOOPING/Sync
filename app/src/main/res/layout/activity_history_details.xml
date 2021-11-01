@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/item_color"
-    tools:context=".HistoryDetailsActivity"
+    tools:context="com.sync.imusic.HistoryDetailsActivity"
     android:id="@+id/container_history_details">
 
     <com.google.android.material.appbar.AppBarLayout

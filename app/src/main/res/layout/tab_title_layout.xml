@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/txt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="text"
+        android:textAllCaps="true"
+        android:fontFamily="sans-serif"
+        android:textColor="@drawable/custom_tab_title_bg"
+        android:textSize="20sp"/>
+
+</RelativeLayout>

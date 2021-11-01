@@ -3,65 +3,87 @@
 
     <PreferenceCategory
         android:layout_width="wrap_content"
-        app:title="@string/messages_header">
+        app:title="Video">
 
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
+        <ListPreference
+            app:defaultValue="2"
+            app:entries="@array/video_mode"
+            app:entryValues="@array/video_mode_value"
+            app:key="video_mode"
+            app:title="@string/video_mode_title"
             app:useSimpleSummaryProvider="true" />
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
+            app:defaultValue="1"
+            app:entries="@array/video_orientation"
+            app:entryValues="@array/video_orientation_value"
+            app:key="video_orientation"
+            app:title="@string/video_orientation_title"
             app:useSimpleSummaryProvider="true" />
 
-    </PreferenceCategory>
+        <CheckBoxPreference
+            app:defaultValue="true"
+            app:summary="@string/lock_with_sensor_summary"
+            app:key="lock_with_sensor"
+            app:title="Lock with sensor" />
 
-    <PreferenceCategory app:title="@string/sync_header">
+        <CheckBoxPreference
+            app:defaultValue="true"
+            app:summary="@string/volume_gesture_summary"
+            app:key="volume_gesture"
+            app:title="Volume gesture" />
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+        <CheckBoxPreference
+            app:defaultValue="true"
+            app:summary="@string/lock_with_sensor_summary"
+            app:key="brightness_gesture"
+            app:title="Brightness gesture" />
 
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+        <CheckBoxPreference
+            app:defaultValue="true"
+            app:summary="@string/summary_resume_playback"
+            app:key="resume_playback"
+            app:title="Resume playback" />
 
-    </PreferenceCategory>
-    <PreferenceCategory app:title="@string/messages_header">
-
-        <EditTextPreference
-            app:key="signature"
-            app:title="@string/signature_title"
-            app:useSimpleSummaryProvider="true" />
+        <CheckBoxPreference
+            app:defaultValue="false"
+            app:summary="@string/summary_auto_skip_video"
+            app:key="auto_skip_video"
+            app:title="Next Video" />
 
         <ListPreference
-            app:defaultValue="reply"
-            app:entries="@array/reply_entries"
-            app:entryValues="@array/reply_values"
-            app:key="reply"
-            app:title="@string/reply_title"
+            app:defaultValue="3"
+            app:entries="@array/auto_hide"
+            app:entryValues="@array/auto_hide_value"
+            app:key="control_hide_delay"
+            app:title="Video player controls hiding delay"
             app:useSimpleSummaryProvider="true" />
 
     </PreferenceCategory>
-    <PreferenceCategory app:title="@string/sync_header">
 
-        <SwitchPreferenceCompat
-            app:key="sync"
-            app:title="@string/sync_title" />
+    <PreferenceCategory app:title="History">
 
-        <SwitchPreferenceCompat
-            app:dependency="sync"
-            app:key="attachment"
-            app:summaryOff="@string/attachment_summary_off"
-            app:summaryOn="@string/attachment_summary_on"
-            app:title="@string/attachment_title" />
+        <CheckBoxPreference
+            android:key="history"
+            android:title="@string/checkbox_title"
+            app:defaultValue="true"
+            app:summary="@string/history_summary" />
+
+    </PreferenceCategory>
+
+    <PreferenceCategory app:title="Music">
+
+        <CheckBoxPreference
+            app:defaultValue="true"
+            app:summary="@string/summary_visualiser"
+            app:key="show_visualiser"
+            app:title="Visualiser Bars" />
+
+        <CheckBoxPreference
+            app:defaultValue="true"
+            app:summary="@string/summary_auto_skip"
+            app:key="auto_skip"
+            app:title="Next Song" />
 
     </PreferenceCategory>
 

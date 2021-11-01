@@ -5,24 +5,24 @@
     <item
         android:id="@+id/info_contextual_menu_music_adapter"
         android:icon="@drawable/ic_baseline_info"
-        android:title="info"
+        android:title="Information"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/share_contextual_menu_music_adapter"
         android:icon="@drawable/share"
-        android:title="info"
+        android:title="Share"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/play_contextual_menu_music_adapter"
         android:icon="@drawable/exo_icon_play"
         android:iconTint="@color/white"
-        android:title="info"
+        android:title="Play"
         app:showAsAction="always" />
 
     <item
-        android:title=""
+        android:title="More options"
         app:showAsAction="always"
         android:icon="@drawable/ic_baseline_more_white">
 

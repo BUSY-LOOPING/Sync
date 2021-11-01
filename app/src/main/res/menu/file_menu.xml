@@ -4,7 +4,7 @@
     <item
         android:id="@+id/search_file_menu"
         android:icon="@drawable/ic_search"
-        android:title="Search"
+        android:title="Search..."
         app:actionViewClass="androidx.appcompat.widget.SearchView"
         app:showAsAction="ifRoom|collapseActionView" />
 
@@ -17,7 +17,7 @@
 
     <item
         android:icon="@drawable/ic_baseline_more_white"
-        android:title=""
+        android:title="More options"
         app:showAsAction="ifRoom">
         <menu>
             <item

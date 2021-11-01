@@ -44,7 +44,7 @@
 <!--            </com.google.android.material.appbar.CollapsingToolbarLayout>-->
 
             <androidx.appcompat.widget.Toolbar
-                app:title="iMusic"
+                app:title="Sync"
                 app:titleTextColor="@color/white"
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -70,6 +70,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="25dp"
+            android:scaleType="fitXY"
             android:backgroundTint="@color/tab_highlight"
             android:contentDescription="shuffle"
             android:src="@drawable/exo_controls_shuffle_on"

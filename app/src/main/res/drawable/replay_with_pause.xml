@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:bottom="3dp"
+        android:drawable="@drawable/ic_replay_with_pause"
+        android:left="1dp"
+        android:right="1dp"
+        android:top="3dp" />
+
+</layer-list>

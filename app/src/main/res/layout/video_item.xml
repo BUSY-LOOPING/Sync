@@ -7,25 +7,53 @@
     android:background="@drawable/custom_ripple"
     android:padding="3dp">
 
-    <ImageView
-        android:id="@+id/thumbnail_video_item"
-        android:layout_width="140dp"
-        android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:paddingStart="5dp"
-        android:scaleType="centerCrop"
-        android:src="@color/black" />
+    <RelativeLayout
+        android:id="@+id/relLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="5dp"
+        android:layout_marginEnd="5dp">
+
+
+        <ImageView
+            android:id="@+id/thumbnail_video_item"
+            android:layout_width="140dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:src="@color/black" />
+
+        <ImageView
+            android:id="@+id/seen"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:src="@drawable/ic_checked_checkbox" />
+
+    </RelativeLayout>
 
     <ImageView
         android:id="@+id/thumbnail_video_item_selected"
         android:layout_width="140dp"
-        android:layout_height="match_parent"
-        android:layout_margin="5dp"
-        android:paddingStart="5dp"
+        android:layout_height="80dp"
+        android:layout_centerVertical="true"
         android:scaleX="0.5"
         android:scaleY="0.5"
         android:visibility="gone"
         app:srcCompat="@drawable/ic_baseline_check_circle_24" />
+
+    <androidx.core.widget.ContentLoadingProgressBar
+        android:id="@+id/bar"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+        android:layout_width="140dp"
+        android:layout_height="1.5dp"
+        android:layout_below="@+id/relLayout"
+        android:layout_marginStart="5dp"
+        android:background="@color/item_color"
+        android:progress="0"
+        android:progressBackgroundTint="@color/item_color"
+        android:progressTint="@color/tab_highlight" />
 
     <TextView
         android:id="@+id/video_displayName_video_item"
@@ -36,7 +64,7 @@
         android:layout_marginStart="18dp"
         android:layout_marginTop="15dp"
         android:layout_toStartOf="@+id/menuMore_video_item"
-        android:layout_toEndOf="@+id/thumbnail_video_item"
+        android:layout_toEndOf="@+id/relLayout"
         android:ellipsize="end"
         android:maxLines="2"
         android:text="Video Display Name"
@@ -51,7 +79,7 @@
         android:layout_gravity="center"
         android:layout_marginStart="18dp"
         android:layout_marginTop="8sp"
-        android:layout_toEndOf="@+id/thumbnail_video_item"
+        android:layout_toEndOf="@+id/relLayout"
         android:text="11min41s  .  1080p"
         android:textColor="#AFA7A7"
         android:textSize="12sp"

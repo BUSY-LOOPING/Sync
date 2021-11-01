@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name="auto_hide">
+        <item>after 1 sec</item>
+        <item>after 2 sec</item>
+        <item>after 3 sec</item>
+        <item>after 4 sec</item>
+        <item>after 5 sec</item>
+        <item>Do not hide</item>
+    </string-array>
+
+    <string-array name="auto_hide_value">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </string-array>
+
+</resources>

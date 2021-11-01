@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/resume_playback_album"
+        android:icon="@drawable/replay_with_pause"
+        android:title="Resume playback"
+        app:showAsAction="ifRoom" />
+    <item android:title="Sort by...">
+        <menu>
+            <item
+                android:id="@+id/sort_by_name"
+                android:title="Name"
+                app:showAsAction="never" />
+<!--            <item-->
+<!--                android:id="@+id/sort_by_length"-->
+<!--                android:title="Length"-->
+<!--                app:showAsAction="never" />-->
+<!--            <item-->
+<!--                android:id="@+id/sort_by_date"-->
+<!--                android:title="Date"-->
+<!--                app:showAsAction="never" />-->
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/refresh"
+        android:title="Refresh"
+        app:showAsAction="never" />
+
+
+</menu>

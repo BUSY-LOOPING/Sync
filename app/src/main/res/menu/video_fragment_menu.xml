@@ -2,28 +2,38 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/search_item_fragment_videos"
-        android:title=""
+    <item
+        android:id="@+id/search_item_fragment_videos"
         android:icon="@drawable/ic_search"
-        app:showAsAction="ifRoom|collapseActionView"
-        app:actionViewClass="androidx.appcompat.widget.SearchView" />
+        android:title="Search"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"
+        app:showAsAction="ifRoom|collapseActionView" />
 
-    <item android:title=""
-        android:icon="@drawable/quantum_ic_replay_10_white_24"
+    <item
+        android:id="@+id/resume_playback"
+        android:icon="@drawable/replay_with_pause"
+        android:title="Resume playback"
         app:showAsAction="ifRoom" />
 
 
-    <item android:title="Sort By"
+    <item
+        android:title="Sort By"
         app:showAsAction="never">
         <menu>
-            <item android:title="Name"/>
-            <item android:title="Length"/>
-            <item android:title="Recently added"/>
+            <item
+                android:id="@+id/sortByName"
+                android:title="Name" />
+            <item
+                android:id="@+id/sortByLength"
+                android:title="Length" />
+            <item
+                android:id="@+id/sortRecentlyAdded"
+                android:title="Recently added" />
         </menu>
     </item>
 
     <item
         android:id="@+id/refresh_video_fragment"
         android:title="Refresh"
-        app:showAsAction="never"/>
+        app:showAsAction="never" />
 </menu>

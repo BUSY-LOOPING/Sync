@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.imusic">
+    package="com.sync.imusic">
 
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> <!-- <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/> -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <!-- <uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION"/> -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -16,9 +17,9 @@
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
 
     <application
-        android:name=".ApplicationClass"
+        android:name="com.sync.imusic.ApplicationClass"
         android:allowBackup="true"
-        android:configChanges="orientation|screenSize|layoutDirection"
+        android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
         android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -27,26 +28,27 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.IMusic"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        tools:targetApi="n">
         <activity
-            android:name=".SettingsActivity"
+            android:name="com.sync.imusic.SettingsActivity"
             android:exported="true"
             android:label="@string/title_activity_settings" />
         <activity
-            android:name=".AboutActivity"
+            android:name="com.sync.imusic.AboutActivity"
             android:exported="true"
             android:label="@string/title_activity_about"
             android:theme="@style/Theme.IMusic.NoActionBar" />
         <activity
-            android:name=".InfoActivityVideo"
+            android:name="com.sync.imusic.InfoActivityVideo"
             android:exported="true" />
         <activity
-            android:name=".HistoryDetailsActivity"
+            android:name="com.sync.imusic.HistoryDetailsActivity"
             android:exported="true" />
         <activity
-            android:name=".StreamActivity"
+            android:name="com.sync.imusic.StreamActivity"
             android:exported="true">
-            <intent-filter android:label="Play in iMusic">
+            <intent-filter android:label="Play in Sync">
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -55,7 +57,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".StreamPlayer"
+            android:name="com.sync.imusic.StreamPlayer"
             android:configChanges="orientation|screenSize|smallestScreenSize|layoutDirection|screenLayout"
             android:excludeFromRecents="true"
             android:hardwareAccelerated="true"
@@ -63,24 +65,26 @@
             android:resizeableActivity="true"
             android:supportsPictureInPicture="true"
             tools:targetApi="n" />
-        <activity android:name=".PlaylistContentsActivity" />
-        <activity android:name=".FileActivity" />
-        <activity android:name=".InfoActivity" />
-        <activity android:name=".AlbumDetails" />
+        <activity android:name="com.sync.imusic.PlaylistContentsActivity" />
         <activity
-            android:name=".PlayerActivity"
+            android:name="com.sync.imusic.FileActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation" />
+        <activity android:name="com.sync.imusic.InfoActivity" />
+        <activity android:name="com.sync.imusic.AlbumDetails" />
+        <activity
+            android:name="com.sync.imusic.PlayerActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".MainActivity"
-            android:configChanges="screenSize|layoutDirection|screenLayout"
+            android:name="com.sync.imusic.MainActivity"
+            android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:launchMode="singleTask"
             android:resizeableActivity="true"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan"
             tools:targetApi="n" />
         <activity
-            android:name=".SplashActivity"
+            android:name="com.sync.imusic.SplashActivity"
             android:screenOrientation="portrait"
             android:theme="@style/SplashTheme">
             <intent-filter>
@@ -88,7 +92,7 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter android:label="Open iMusic">
+            <intent-filter android:label="Open Sync">
                 <action android:name="android.intent.action.SEND" />
 
                 <category android:name="android.intent.category.DEFAULT" />
@@ -97,7 +101,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".VideoPlayerActivity"
+            android:name="com.sync.imusic.VideoPlayerActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|layoutDirection|screenLayout"
             android:excludeFromRecents="true"
             android:hardwareAccelerated="false"
@@ -107,11 +111,11 @@
             tools:targetApi="n" />
 
         <service
-            android:name=".MusicService"
+            android:name="com.sync.imusic.MusicService"
             android:enabled="true" />
 
         <receiver
-            android:name=".NotificationReceiver"
+            android:name="com.sync.imusic.NotificationReceiver"
             android:enabled="true"
             android:exported="false">
             <intent-filter>

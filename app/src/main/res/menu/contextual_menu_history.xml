@@ -12,10 +12,11 @@
         android:iconTint="@color/white"
         android:title="Play"
         app:showAsAction="always" />
+
     <item
         android:id="@+id/append_contextual_menu_history"
-        android:icon="@drawable/ic_baseline_playlist_add_24"
-        android:iconTint="@color/white"
+        android:icon="@drawable/play_with_plus"
+        app:iconTint="@color/white"
         android:title="Append"
         app:showAsAction="always" />
 

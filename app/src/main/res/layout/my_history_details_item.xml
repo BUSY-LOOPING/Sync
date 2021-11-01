@@ -62,6 +62,8 @@
             android:textSize="16sp" />
 
         <TextView
+            android:maxLines="2"
+            android:ellipsize="end"
             android:id="@+id/artist_history_details_item"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

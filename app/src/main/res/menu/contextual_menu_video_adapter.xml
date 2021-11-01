@@ -10,7 +10,8 @@
 
     <item
         android:id="@+id/append_contextual_menu_videoAdapter"
-        android:actionLayout="@layout/play_with_append_custom_layout"
+        android:icon="@drawable/play_with_plus"
+        android:iconTint="@color/white"
         android:title="Append"
         app:showAsAction="ifRoom" />
 
@@ -25,6 +26,9 @@
             <item
                 android:id="@+id/browse_parent_contextual_menu_videoAdapter"
                 android:title="Browse parent" />
+            <item
+                android:id="@+id/mark_unseen"
+                android:title="Mark as unseen" />
         </menu>
     </item>
 
